@@ -1,6 +1,7 @@
 package com.jamsirat.atmapi.service.impl;
 
-import com.jamsirat.atmapi.dto.AuthenticationResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jamsirat.atmapi.dto.response.AuthenticationResponse;
 import com.jamsirat.atmapi.dto.request.LoginRequest;
 import com.jamsirat.atmapi.dto.request.RegistrationRequest;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
@@ -12,6 +13,8 @@ import com.jamsirat.atmapi.repository.ITokenRepository;
 import com.jamsirat.atmapi.repository.IUserRepository;
 import com.jamsirat.atmapi.service.IAuthenticationService;
 import com.jamsirat.atmapi.service.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -102,12 +106,40 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         if (validTokenUsers.isEmpty()) {
             return;
         }
-
         validTokenUsers.forEach(token -> {
             token.setTokenExpired(true);
             token.setRevoked(true);
         });
-
         tokenRepository.saveAll(validTokenUsers);
+    }
+
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final String authHeader = request.getHeader("Authorization");
+        final String refreshToken;
+        final String userEmail;
+
+        if (authHeader == null || !authHeader.startsWith(" Bearer")) {
+            return;
+        }
+
+        //get refresh token from header
+        refreshToken = authHeader.substring(7);
+
+        userEmail = jwtService.extractUsername(refreshToken);
+        if (userEmail != null) {
+            var user = userRepository.findByUserName(userEmail).orElseThrow(()-> new UsernameNotFoundException("Username not found exception"));
+            //get valid token
+            if (jwtService.isTokenValid(refreshToken,user)) {
+                var accessToken  = jwtService.generateToken(user);
+                revokeAllUserToken(user);
+                saveUserToken(user,accessToken);
+                var authResponse = AuthenticationResponse
+                        .builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken);
+
+                new ObjectMapper().writeValue(response.getOutputStream(),authResponse);
+            }
+        }
     }
 }

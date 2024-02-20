@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.dto;
+package com.jamsirat.atmapi.dto.response;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;

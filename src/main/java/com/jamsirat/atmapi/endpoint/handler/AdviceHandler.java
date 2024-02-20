@@ -1,6 +1,6 @@
 package com.jamsirat.atmapi.endpoint.handler;
 
-import com.jamsirat.atmapi.dto.HttpResponse;
+import com.jamsirat.atmapi.dto.response.HttpResponse;
 import com.jamsirat.atmapi.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -67,4 +67,3 @@ import java.time.LocalDateTime;
                     .build();
         }
     }
-
