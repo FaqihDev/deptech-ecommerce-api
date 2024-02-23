@@ -3,18 +3,23 @@ package com.jamsirat.atmapi.endpoint;
 import com.jamsirat.atmapi.dto.request.LoginRequest;
 import com.jamsirat.atmapi.dto.request.RegistrationRequest;
 import com.jamsirat.atmapi.dto.response.AuthenticationResponse;
+import com.jamsirat.atmapi.dto.response.HttpResponse;
+import com.jamsirat.atmapi.service.JwtService;
 import com.jamsirat.atmapi.service.impl.AuthenticationServiceImpl;
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.print.attribute.standard.Media;
+
 import java.io.IOException;
+import java.net.URI;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping(value = IApplicationConstant.ContextPath.AUTHENTICATION,
@@ -24,10 +29,31 @@ import java.io.IOException;
 public class RegistrationEndpoint {
 
     private final AuthenticationServiceImpl authenticationService;
+    private final JwtService jwtService;
 
     @PostMapping(IApplicationConstant.Path.Authentication.REGISTER)
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegistrationRequest request) {
-        return ResponseEntity.ok(authenticationService.register(request));
+    public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
+        var user = authenticationService.register(request);
+        var tokenUser = jwtService.generateToken(user);
+        var refreshToken = jwtService.refreshToken(user);
+
+        AuthenticationResponse response = AuthenticationResponse.builder()
+                .name(user.getFirstName() + " " + user.getLastName())
+                .isEnabled(user.getIsActive())
+                .accessToken(tokenUser)
+                .refreshToken(refreshToken)
+                .build();
+
+        return ResponseEntity.created(URI.create("")).body(
+                HttpResponse.builder()
+                        .timeStamp(LocalDateTime.now().toString())
+                        .developerMessage("Please login to your account")
+                        .message("User created")
+                        .status(HttpStatus.CREATED)
+                        .data(response)
+                        .build()
+        );
+
     }
 
     @GetMapping(IApplicationConstant.Path.Authentication.LOGIN)

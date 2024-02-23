@@ -7,7 +7,7 @@ import com.jamsirat.atmapi.model.User;
 
 public interface IAuthenticationService {
 
-     AuthenticationResponse register(RegistrationRequest request);
+     User register(RegistrationRequest request);
 
      void saveUserToken(User user, String token);
 

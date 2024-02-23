@@ -45,7 +45,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 
     @Override
-    public AuthenticationResponse register(RegistrationRequest request) {
+    public User register(RegistrationRequest request) {
 
         Set<Role>roles = new HashSet<>();
         EUserRole role = EUserRole.USER;
@@ -71,14 +71,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
        var currentUser = userRepository.save(user);
        var jwtToken = jwtService.generateToken(currentUser);
-       var refreshToken = jwtService.refreshToken(currentUser);
        saveUserToken(currentUser,jwtToken);
-
-       return AuthenticationResponse.builder()
-               .accessToken(jwtToken)
-               .name(currentUser.getFirstName())
-               .refreshToken(refreshToken)
-               .build();
+        return currentUser;
 
     }
 

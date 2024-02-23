@@ -1,4 +1,5 @@
-port: 8084
+server:
+  port: 8084
 spring:
   jpa:
     hibernate:
@@ -15,8 +16,8 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/atm
-    username: jamsirat
-    password: passwordjamsirat
+    username: thb
+    password: thbdesabase
 
 application:
   security:
