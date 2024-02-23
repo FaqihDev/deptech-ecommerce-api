@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity
@@ -14,7 +16,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Setter
 @Getter
-public class UserProfileExtended {
+public class UserProfileExtended implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 5773885358142110306L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

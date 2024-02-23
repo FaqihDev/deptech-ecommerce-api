@@ -8,7 +8,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 
-
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -21,8 +22,12 @@ import java.util.stream.Collectors;
 @Builder
 @Setter
 @Getter
-@Table(name = "user")
-public class User extends BaseMasterData implements UserDetails {
+@Table(name = "users")
+public class User extends BaseMasterData implements UserDetails, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1149799443782698228L;
+
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private UserProfile userProfile;

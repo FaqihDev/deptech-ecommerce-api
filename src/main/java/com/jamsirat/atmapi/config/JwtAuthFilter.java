@@ -38,7 +38,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         //check if the url is authentication
-        if (httpServletRequest.getServletPath().contains("/api/v1/auth")) {
+        if (httpServletRequest.getServletPath().startsWith("/api/v1/auth")) {
             filterChain.doFilter(httpServletRequest,httpServletResponse);
         }
 
@@ -48,8 +48,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
 
-        if (authHeader == null || !authHeader.startsWith(" Bearer")); {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(httpServletRequest,httpServletResponse);
+            return;
         }
 
         if (Objects.nonNull(authHeader)) {

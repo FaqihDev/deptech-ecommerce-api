@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 
 
 @Entity
@@ -13,7 +15,10 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserProfile extends BaseMasterData {
+public class UserProfile extends BaseMasterData implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -4474084425849609899L;
 
     @Column(name = "email")
     private String email;

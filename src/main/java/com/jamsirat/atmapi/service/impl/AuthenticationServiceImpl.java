@@ -13,6 +13,8 @@ import com.jamsirat.atmapi.repository.ITokenRepository;
 import com.jamsirat.atmapi.repository.IUserRepository;
 import com.jamsirat.atmapi.service.IAuthenticationService;
 import com.jamsirat.atmapi.service.JwtService;
+import com.jamsirat.atmapi.statval.enumeration.ETokenType;
+import com.jamsirat.atmapi.statval.enumeration.EUserRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -45,12 +48,17 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public AuthenticationResponse register(RegistrationRequest request) {
 
         Set<Role>roles = new HashSet<>();
+        EUserRole role = EUserRole.USER;
         try {
-            roles.add(roleRepository.findByUserRole(request.getRoleName()));
+            Role userRole = roleRepository.findByUserRole(role);
+            if (Objects.nonNull(userRole)) {
+                roles.add(userRole);
+            }
         } catch (DataNotFoundException e) {
-            log.error("Error find Role by Code {} : {} " + request.getRoleName(), e.toString());
+            log.error("Error find Role by Code {} : {} " + role, e.toString());
             throw new DataNotFoundException(404,"Role not found");
         }
+
 
         var user = User.builder()
                 .firstName(request.getFirstName())
@@ -79,6 +87,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         var userToken = Token.builder()
                 .user(user)
                 .token(token)
+                .tokenType(ETokenType.BEARER)
                 .isTokenExpired(false)
                 .isRevoked(false)
                 .build();

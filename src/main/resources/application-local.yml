@@ -1,0 +1,39 @@
+server:
+  port: 8084
+spring:
+  jpa:
+    hibernate:
+      ddl-auto : update
+      show-sql : true
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 3MB
+  application:
+    name: ATM Web App
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/test
+    username: faqih
+    password: passwordpostgres
+
+application:
+  security:
+    jwt:
+      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      expiration: 86400000 # a day
+      refresh-token: 604800000 # 7 days
+
+#LOGGING
+logging:
+  level:
+    com:
+      thbdesabase:
+        orderServices: debug
+    org:
+      hibernate:
+        SQL : debug
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace

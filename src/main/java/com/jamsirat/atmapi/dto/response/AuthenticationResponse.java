@@ -19,5 +19,4 @@ public class AuthenticationResponse implements Serializable {
     private String name;
     private String accessToken;
     private String refreshToken;
-
 }

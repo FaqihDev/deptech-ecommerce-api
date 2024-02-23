@@ -11,7 +11,6 @@ import com.jamsirat.atmapi.statval.enumeration.EAccessType;
 import com.jamsirat.atmapi.statval.enumeration.EUserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -25,7 +24,6 @@ public class AuthorizationServiceImpl implements IAuthorizationService {
     private final IUserRepository userRepository;
 
     private final IRoleRepository roleRepository;
-    private  BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public GrantRoleAccessResponse giveAccessToUser(Long userId, Long roleId, Principal principal) {

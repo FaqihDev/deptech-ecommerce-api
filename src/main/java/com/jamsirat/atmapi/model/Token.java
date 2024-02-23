@@ -4,6 +4,8 @@ import com.jamsirat.atmapi.statval.enumeration.ETokenType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 
 
 @Entity
@@ -13,7 +15,10 @@ import lombok.*;
 @Builder
 @Setter
 @Getter
-public class Token extends BaseMasterData {
+public class Token extends BaseMasterData implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 3201884138615687279L;
 
     @Column(name = "token", unique = true)
     public String token;

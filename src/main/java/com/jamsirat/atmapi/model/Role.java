@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +18,10 @@ import java.util.Set;
 @Builder
 @Setter
 @Getter
-public class Role extends BaseMasterData {
+public class Role extends BaseMasterData implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 783521278187749739L;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
