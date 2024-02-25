@@ -68,11 +68,11 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(roles)
                 .build();
-
+       roleRepository.saveAll(roles);
        var currentUser = userRepository.save(user);
        var jwtToken = jwtService.generateToken(currentUser);
        saveUserToken(currentUser,jwtToken);
-        return currentUser;
+       return currentUser;
 
     }
 
