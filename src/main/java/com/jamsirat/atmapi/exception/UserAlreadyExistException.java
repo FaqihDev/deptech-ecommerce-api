@@ -1,15 +1,25 @@
 package com.jamsirat.atmapi.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Service;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserAlreadyExistException extends RuntimeException{
+@Setter
+@Getter
+public class UserAlreadyExistException extends AuthenticationException {
 
     private Integer responseCode;
     private String exceptionMessage;
+
+    public UserAlreadyExistException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public UserAlreadyExistException(String msg, String exceptionMessage) {
+        super(msg);
+        this.responseCode = 401;
+        this.exceptionMessage = exceptionMessage;
+    }
+
 
 }

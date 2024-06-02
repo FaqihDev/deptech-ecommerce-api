@@ -16,6 +16,17 @@ spring:
     url: jdbc:postgresql://localhost:5432/atm
     username: jamsirat
     password: passwordjamsirat
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: iamfaqih.rochman@gmail.com
+    password: nzzn ersd kele yhmu
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 application:
   security:

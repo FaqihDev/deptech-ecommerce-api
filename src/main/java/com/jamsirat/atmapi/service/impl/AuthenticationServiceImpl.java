@@ -5,10 +5,7 @@ import com.jamsirat.atmapi.dto.response.AuthenticationResponse;
 import com.jamsirat.atmapi.dto.request.LoginRequest;
 import com.jamsirat.atmapi.dto.request.RegistrationRequest;
 import com.jamsirat.atmapi.dto.response.HttpResponse;
-import com.jamsirat.atmapi.exception.BadCredentialsException;
-import com.jamsirat.atmapi.exception.DataNotFoundException;
-import com.jamsirat.atmapi.exception.UserNotActivatedException;
-import com.jamsirat.atmapi.exception.UserNotFoundException;
+import com.jamsirat.atmapi.exception.*;
 import com.jamsirat.atmapi.model.Role;
 import com.jamsirat.atmapi.model.Token;
 import com.jamsirat.atmapi.model.User;
@@ -64,6 +61,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new DataNotFoundException(404,"Role not found");
         }
 
+           var existUser = userRepository.findByUserName(request.getEmail());
+           if (existUser.isPresent()) {
+               throw new UserAlreadyExistException("user is already taken","msg");
+           }
 
         var user = User.builder()
                 .firstName(request.getFirstName())

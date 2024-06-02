@@ -62,6 +62,7 @@ import java.time.LocalDateTime;
             return HttpResponse.builder()
                     .timeStamp(LocalDateTime.now().toString())
                     .status(HttpStatus.BAD_REQUEST)
+                    .developerMessage("Please choose another email")
                     .statusCode(HttpStatus.BAD_REQUEST.value())
                     .message("User is already exist")
                     .build();
@@ -73,6 +74,7 @@ import java.time.LocalDateTime;
             return HttpResponse.builder()
                     .timeStamp(LocalDateTime.now().toString())
                     .status(HttpStatus.FORBIDDEN)
+                    .developerMessage("Please verify your account to the link we sent")
                     .statusCode(HttpStatus.FORBIDDEN.value())
                     .message("User is not activated")
                     .build();
