@@ -10,8 +10,8 @@ import org.springframework.context.event.EventListener;
 @SpringBootApplication
 public class AtmApiApplication {
 
-	@Autowired
-	private EmailSenderService emailSenderService;
+//	@Autowired
+//	private EmailSenderService emailSenderService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(AtmApiApplication.class, args);
@@ -19,8 +19,8 @@ public class AtmApiApplication {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void triggerMail() {
-		emailSenderService.sendSimpleEmail("thbdesabase@gmail.com",
-				"This is the email body..","this the email subject");
+//		emailSenderService.sendSimpleEmail("thbdesabase@gmail.com",
+//				"This is the email body..","this the email subject");
 
 	}
 

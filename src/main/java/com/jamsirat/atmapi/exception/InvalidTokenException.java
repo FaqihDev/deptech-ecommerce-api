@@ -1,20 +1,21 @@
 package com.jamsirat.atmapi.exception;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.AuthenticationException;
 
 @Getter
 @Setter
-public class EmailAlreadyVerifiedException extends AuthenticationException {
+public class InvalidTokenException extends AuthenticationException {
 
     private Integer responseCode;
     private String exceptionMessage;
 
-    public EmailAlreadyVerifiedException(String msg, Throwable cause) {
+    public InvalidTokenException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
-    public EmailAlreadyVerifiedException(String msg) {
+    public InvalidTokenException(String msg) {
         super(msg);
     }
 }

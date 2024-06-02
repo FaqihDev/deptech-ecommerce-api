@@ -23,6 +23,7 @@ public interface IApplicationConstant {
             String REGISTER = "/register";
             String LOGIN = "/login";
             String REFRESH_TOKEN = "/refresh-token";
+            String VERIFY_ACCOUNT = "/verifyEmail";
         }
 
     }

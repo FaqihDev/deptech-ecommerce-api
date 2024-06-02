@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
-    @RestControllerAdvice
-    public class AdviceHandler {
+@RestControllerAdvice
+public class AdviceHandler {
 
         @ExceptionHandler(DataNotFoundException.class)
         @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -42,6 +42,7 @@ import java.time.LocalDateTime;
                     .status(HttpStatus.BAD_REQUEST)
                     .statusCode(HttpStatus.BAD_REQUEST.value())
                     .message("Email is already verified")
+                    .developerMessage("Please login to your account")
                     .build();
         }
 
@@ -100,6 +101,18 @@ import java.time.LocalDateTime;
                     .statusCode(HttpStatus.NOT_FOUND.value())
                     .developerMessage("Please verify your account")
                     .message("User is not found")
+                    .build();
+        }
+
+        @ExceptionHandler(InvalidTokenException.class)
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        public HttpResponse UserNotFoundException(InvalidTokenException e) {
+            return HttpResponse.builder()
+                    .timeStamp(LocalDateTime.now().toString())
+                    .status(HttpStatus.NOT_FOUND)
+                    .statusCode(HttpStatus.NOT_FOUND.value())
+                    .developerMessage("")
+                    .message("Token is invalid !")
                     .build();
         }
     }

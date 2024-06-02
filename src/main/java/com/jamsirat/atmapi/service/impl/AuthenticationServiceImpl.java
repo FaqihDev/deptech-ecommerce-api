@@ -46,8 +46,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final AuthenticationManager authenticationManager;
 
 
+
     @Override
-    public User register(RegistrationRequest request) {
+    public User register(RegistrationRequest request, HttpServletRequest httpServletRequest) {
 
         Set<Role>roles = new HashSet<>();
         EUserRole role = EUserRole.USER;
@@ -78,9 +79,11 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
        var currentUser = userRepository.save(user);
        var jwtToken = jwtService.generateToken(currentUser);
        saveUserToken(currentUser,jwtToken);
-       return currentUser;
 
+       return currentUser;
     }
+
+
 
     @Override
     public void saveUserToken(User user, String token) {
@@ -130,6 +133,48 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .build();
     }
 
+    @Override
+    public AuthenticationResponse verifyEmail(String token) {
+        var verifyToken  = tokenRepository.findByToken(token).orElseThrow(()-> new IllegalArgumentException("Invalid token"));
+        if (verifyToken.getUser().isEnabled()) {
+            throw new EmailAlreadyVerifiedException("Email is already verified please login!");
+        }
+
+        String verifiedToken = validateToken(verifyToken.token);
+        if (verifiedToken.equals("valid")) {
+         verifyToken.getUser().setIsActive(true);
+         tokenRepository.save(verifyToken);
+         return AuthenticationResponse.builder()
+                    .accessToken(verifiedToken)
+                    .isEnabled(verifyToken.getUser().isEnabled())
+                    .build();
+        } else {
+            throw new IllegalArgumentException("Invalid Token");
+        }
+    }
+
+    @Override
+    public String validateToken(String token) {
+        var tokenVerifiy = tokenRepository.findByToken(token);
+        if (Objects.isNull(tokenVerifiy)) {
+            throw new InvalidTokenException("Token is invalid");
+        }
+
+        var user = tokenVerifiy.get().getUser();
+        if (!jwtService.isTokenValid(tokenVerifiy.get().token, user)) {
+            throw new InvalidTokenException("Token is invalid");
+        }
+
+        user.setIsActive(true);
+        userRepository.save(user);
+        return "valid";
+    }
+
+    @Override
+    public String applicationUrl(HttpServletRequest request) {
+        return "http://" + request.getServerName()+ ":" + request.getServerPort()+request.getContextPath();
+    }
+
     private void revokeAllUserToken(User user) {
         var validTokenUsers = tokenRepository.findAllByValidToken(user.getId());
         if (validTokenUsers.isEmpty()) {
@@ -141,6 +186,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         });
         tokenRepository.saveAll(validTokenUsers);
     }
+
+
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = request.getHeader("Authorization");
