@@ -1,12 +1,15 @@
 package com.jamsirat.atmapi.service;
 
 
-import com.jamsirat.atmapi.model.User;
+
+import com.jamsirat.atmapi.model.UserProfile;
 import com.jamsirat.atmapi.statval.enumeration.EValidationResult;
+import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
-public interface ICustomRegistrationValidator extends Function<User, EValidationResult> {
+@Service
+public interface ICustomRegistrationValidator extends Function<UserProfile, EValidationResult> {
 
       ICustomRegistrationValidator isPhoneNumberValid();
 

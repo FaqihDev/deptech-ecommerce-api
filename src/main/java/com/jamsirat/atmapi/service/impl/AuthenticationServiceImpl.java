@@ -4,7 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jamsirat.atmapi.dto.response.AuthenticationResponse;
 import com.jamsirat.atmapi.dto.request.LoginRequest;
 import com.jamsirat.atmapi.dto.request.RegistrationRequest;
+import com.jamsirat.atmapi.dto.response.HttpResponse;
+import com.jamsirat.atmapi.exception.BadCredentialsException;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
+import com.jamsirat.atmapi.exception.UserNotActivatedException;
+import com.jamsirat.atmapi.exception.UserNotFoundException;
 import com.jamsirat.atmapi.model.Role;
 import com.jamsirat.atmapi.model.Token;
 import com.jamsirat.atmapi.model.User;
@@ -12,7 +16,6 @@ import com.jamsirat.atmapi.repository.IRoleRepository;
 import com.jamsirat.atmapi.repository.ITokenRepository;
 import com.jamsirat.atmapi.repository.IUserRepository;
 import com.jamsirat.atmapi.service.IAuthenticationService;
-import com.jamsirat.atmapi.service.JwtService;
 import com.jamsirat.atmapi.statval.enumeration.ETokenType;
 import com.jamsirat.atmapi.statval.enumeration.EUserRole;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -55,7 +60,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 roles.add(userRole);
             }
         } catch (DataNotFoundException e) {
-            log.error("Error find Role by Code {} : {} " + role, e.toString());
+            log.error("Error find Role by Code {} : {} " + EUserRole.USER, e.toString());
             throw new DataNotFoundException(404,"Role not found");
         }
 
@@ -89,18 +94,38 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     @Override
-    public AuthenticationResponse login (LoginRequest loginRequest) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword()));
-        var user = userRepository.findByUserName(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("username not found"));
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.refreshToken(user);
+    public HttpResponse<Object> login (LoginRequest loginRequest){
+       try {
+          authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword()));
+       } catch (UserNotActivatedException e) {
+           log.info("Authentication failed : {} ", e.getMessage());
+           throw new UserNotActivatedException("User is not activated yet");
+       } catch (org.springframework.security.authentication.BadCredentialsException e) {
+           throw new BadCredentialsException("Invalid username or password");
+       } catch (UserNotFoundException e) {
+           throw new UserNotFoundException("User is not found");
+       }
+
+       var user = userRepository.findByUserName(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("username not found"));
+       var jwtToken = jwtService.generateToken(user);
+       var refreshToken = jwtService.refreshToken(user);
+
+        AuthenticationResponse response = AuthenticationResponse.builder()
+                        .name(user.getFirstName())
+                        .isEnabled(user.isEnabled())
+                        .accessToken(jwtToken)
+                        .refreshToken(refreshToken)
+                        .build();
 
         revokeAllUserToken(user);
         saveUserToken(user,jwtToken);
-        return AuthenticationResponse
-                .builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
+        return HttpResponse.builder()
+                .message("Profile we trust !")
+                .timeStamp(LocalDateTime.now().toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatus.OK.value())
+                .developerMessage("Login successfull")
+                .data(response)
                 .build();
     }
 

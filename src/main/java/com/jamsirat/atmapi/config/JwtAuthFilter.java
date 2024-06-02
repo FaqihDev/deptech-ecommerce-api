@@ -1,7 +1,7 @@
 package com.jamsirat.atmapi.config;
 
 import com.jamsirat.atmapi.repository.ITokenRepository;
-import com.jamsirat.atmapi.service.JwtService;
+import com.jamsirat.atmapi.service.impl.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

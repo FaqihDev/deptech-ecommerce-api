@@ -9,15 +9,13 @@ spring:
     multipart:
       max-file-size: 3MB
       max-request-size: 3MB
-  profiles:
-    active: local
   application:
     name: ATM Web App
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/atm
-    username: thb
-    password: thbdesabase
+    username: jamsirat
+    password: passwordjamsirat
 
 application:
   security:

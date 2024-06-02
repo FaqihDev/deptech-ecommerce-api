@@ -1,8 +1,8 @@
 package com.jamsirat.atmapi.service;
 
-import com.jamsirat.atmapi.dto.response.AuthenticationResponse;
 import com.jamsirat.atmapi.dto.request.LoginRequest;
 import com.jamsirat.atmapi.dto.request.RegistrationRequest;
+import com.jamsirat.atmapi.dto.response.HttpResponse;
 import com.jamsirat.atmapi.model.User;
 
 public interface IAuthenticationService {
@@ -11,7 +11,7 @@ public interface IAuthenticationService {
 
      void saveUserToken(User user, String token);
 
-     AuthenticationResponse login (LoginRequest loginRequest);
+     HttpResponse<Object> login (LoginRequest loginRequest);
 
 
 }

@@ -66,4 +66,38 @@ import java.time.LocalDateTime;
                     .message("User is already exist")
                     .build();
         }
+
+        @ExceptionHandler(UserNotActivatedException.class)
+        @ResponseStatus(HttpStatus.FORBIDDEN)
+        public HttpResponse userIsNotActivatedException(UserNotActivatedException e) {
+            return HttpResponse.builder()
+                    .timeStamp(LocalDateTime.now().toString())
+                    .status(HttpStatus.FORBIDDEN)
+                    .statusCode(HttpStatus.FORBIDDEN.value())
+                    .message("User is not activated")
+                    .build();
+        }
+
+        @ExceptionHandler(BadCredentialsException.class)
+        @ResponseStatus(HttpStatus.UNAUTHORIZED)
+        public HttpResponse BadCredentialsException(BadCredentialsException e) {
+            return HttpResponse.builder()
+                    .timeStamp(LocalDateTime.now().toString())
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .statusCode(HttpStatus.UNAUTHORIZED.value())
+                    .message("Invalid username or password")
+                    .build();
+        }
+
+        @ExceptionHandler(UserNotFoundException.class)
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        public HttpResponse UserNotFoundException(UserNotFoundException e) {
+            return HttpResponse.builder()
+                    .timeStamp(LocalDateTime.now().toString())
+                    .status(HttpStatus.NOT_FOUND)
+                    .statusCode(HttpStatus.NOT_FOUND.value())
+                    .developerMessage("Please verify your account")
+                    .message("User is not found")
+                    .build();
+        }
     }

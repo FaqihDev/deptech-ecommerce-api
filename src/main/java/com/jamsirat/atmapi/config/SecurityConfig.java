@@ -1,5 +1,6 @@
 package com.jamsirat.atmapi.config;
 
+import com.jamsirat.atmapi.util.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +24,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
+    private final CustomAuthenticationProvider customAuthenticationProvider;
     private final LogoutHandler logoutHandler;
 
 
@@ -37,10 +38,14 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
+                .formLogin()
+                .loginPage("/api/v1/auth/login")
+                .permitAll()
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authenticationProvider(authenticationProvider)
+                .authenticationProvider(customAuthenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout()
                 .logoutUrl("/api/v1/auth/logout")

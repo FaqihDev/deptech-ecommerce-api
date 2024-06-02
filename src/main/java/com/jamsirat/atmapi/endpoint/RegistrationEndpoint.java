@@ -4,7 +4,7 @@ import com.jamsirat.atmapi.dto.request.LoginRequest;
 import com.jamsirat.atmapi.dto.request.RegistrationRequest;
 import com.jamsirat.atmapi.dto.response.AuthenticationResponse;
 import com.jamsirat.atmapi.dto.response.HttpResponse;
-import com.jamsirat.atmapi.service.JwtService;
+import com.jamsirat.atmapi.service.impl.JwtService;
 import com.jamsirat.atmapi.service.impl.AuthenticationServiceImpl;
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 
 import java.io.IOException;
@@ -37,6 +38,8 @@ public class RegistrationEndpoint {
         var tokenUser = jwtService.generateToken(user);
         var refreshToken = jwtService.refreshToken(user);
 
+
+
         AuthenticationResponse response = AuthenticationResponse.builder()
                 .name(user.getFirstName() + " " + user.getLastName())
                 .isEnabled(user.getIsActive())
@@ -56,8 +59,10 @@ public class RegistrationEndpoint {
 
     }
 
-    @GetMapping(IApplicationConstant.Path.Authentication.LOGIN)
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest request) {
+    @GetMapping(value = IApplicationConstant.Path.Authentication.LOGIN,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HttpResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authenticationService.login(request));
     }
 
