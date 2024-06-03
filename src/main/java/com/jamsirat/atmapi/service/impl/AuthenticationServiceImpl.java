@@ -137,15 +137,15 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public AuthenticationResponse verifyEmail(String token) {
         var verifyToken  = tokenRepository.findByToken(token).orElseThrow(()-> new IllegalArgumentException("Invalid token"));
         if (verifyToken.getUser().isEnabled()) {
-            throw new EmailAlreadyVerifiedException("Email is already verified please login!");
+            throw new EmailAlreadyVerifiedException(401,"Email is already verified please login!");
         }
 
-        String verifiedToken = validateToken(verifyToken.token);
-        if (verifiedToken.equals("valid")) {
+
+        if (jwtService.isTokenValid(token, verifyToken.getUser())) {
          verifyToken.getUser().setIsActive(true);
          tokenRepository.save(verifyToken);
          return AuthenticationResponse.builder()
-                    .accessToken(verifiedToken)
+                    .accessToken(token)
                     .isEnabled(verifyToken.getUser().isEnabled())
                     .build();
         } else {
@@ -155,14 +155,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     @Override
     public String validateToken(String token) {
-        var tokenVerifiy = tokenRepository.findByToken(token);
-        if (Objects.isNull(tokenVerifiy)) {
-            throw new InvalidTokenException("Token is invalid");
-        }
-
-        var user = tokenVerifiy.get().getUser();
-        if (!jwtService.isTokenValid(tokenVerifiy.get().token, user)) {
-            throw new InvalidTokenException("Token is invalid");
+        var tokenVerifiy = tokenRepository.findByToken(token).orElseThrow(() -> new InvalidTokenException(404,"Token is invalid"));
+        var user = tokenVerifiy.getUser();
+        if (!jwtService.isTokenValid(tokenVerifiy.token, user)) {
+            throw new InvalidTokenException(404,"Token is invalid");
         }
 
         user.setIsActive(true);

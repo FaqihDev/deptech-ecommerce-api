@@ -5,9 +5,6 @@ import com.jamsirat.atmapi.dto.request.RegistrationRequest;
 import com.jamsirat.atmapi.dto.response.AuthenticationResponse;
 import com.jamsirat.atmapi.dto.response.HttpResponse;
 import com.jamsirat.atmapi.event.RegistrationCompleteEvent;
-import com.jamsirat.atmapi.exception.EmailAlreadyVerifiedException;
-import com.jamsirat.atmapi.exception.InvalidTokenException;
-import com.jamsirat.atmapi.model.Token;
 import com.jamsirat.atmapi.repository.ITokenRepository;
 import com.jamsirat.atmapi.service.impl.JwtService;
 import com.jamsirat.atmapi.service.impl.AuthenticationServiceImpl;
@@ -30,7 +27,6 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping(value = IApplicationConstant.ContextPath.AUTHENTICATION,
-        consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RegistrationEndpoint {
@@ -66,15 +62,13 @@ public class RegistrationEndpoint {
 
     }
 
-    @GetMapping(value = IApplicationConstant.Path.Authentication.LOGIN,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpResponse> login(@RequestBody LoginRequest request) {
+    @GetMapping(value = IApplicationConstant.Path.Authentication.LOGIN)
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authenticationService.login(request));
     }
 
     @GetMapping(value = IApplicationConstant.Path.Authentication.VERIFY_ACCOUNT)
-    public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
+    public ResponseEntity<HttpResponse<?>> verifyEmail(@RequestParam("token") String token) {
         authenticationService.verifyEmail(token);
         return ResponseEntity.ok(HttpResponse.builder()
                 .status(HttpStatus.OK)

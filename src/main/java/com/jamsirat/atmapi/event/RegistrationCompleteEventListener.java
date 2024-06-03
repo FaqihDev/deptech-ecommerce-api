@@ -1,8 +1,8 @@
 package com.jamsirat.atmapi.event;
 
+
 import com.jamsirat.atmapi.model.User;
-import com.jamsirat.atmapi.service.IAuthenticationService;
-import com.jamsirat.atmapi.service.impl.JwtService;
+import com.jamsirat.atmapi.repository.ITokenRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,7 @@ import java.io.UnsupportedEncodingException;
 @RequiredArgsConstructor
 public class RegistrationCompleteEventListener implements ApplicationListener<RegistrationCompleteEvent> {
 
-    private final IAuthenticationService authenticationService;
-    private final JwtService jwtService;
+    private final ITokenRepository tokenRepository;
     private final JavaMailSender mailSender;
     private  User user;
 
@@ -28,9 +27,8 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
     @Override
     public void onApplicationEvent(RegistrationCompleteEvent event) {
         user = event.getUser();
-        String verificationToken = jwtService.generateToken(user);
-        authenticationService.saveUserToken(user, verificationToken);
-        String url = event.getApplicationUrl() + "/register/verifyEmail?token=" + verificationToken;
+        var verificationToken = tokenRepository.findAllByValidToken(user.getId());
+        String url = event.getApplicationUrl() + "/auth/v1/register/verifyEmail?token=" + verificationToken;
 
         try {
             sendVerificationEmail(url);

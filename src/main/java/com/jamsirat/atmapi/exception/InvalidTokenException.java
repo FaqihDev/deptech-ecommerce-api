@@ -1,21 +1,18 @@
 package com.jamsirat.atmapi.exception;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.AuthenticationException;
 
 @Getter
 @Setter
-public class InvalidTokenException extends AuthenticationException {
+@AllArgsConstructor
+@NoArgsConstructor
+public class InvalidTokenException extends RuntimeException {
 
     private Integer responseCode;
     private String exceptionMessage;
 
-    public InvalidTokenException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
-    public InvalidTokenException(String msg) {
-        super(msg);
-    }
 }
