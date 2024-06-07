@@ -17,6 +17,7 @@ import com.jamsirat.atmapi.statval.enumeration.ETokenType;
 import com.jamsirat.atmapi.statval.enumeration.EUserRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -48,6 +50,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 
     @Override
+    @Transactional
     public User register(RegistrationRequest request, HttpServletRequest httpServletRequest) {
 
         Set<Role>roles = new HashSet<>();
@@ -114,11 +117,15 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
        var jwtToken = jwtService.generateToken(user);
        var refreshToken = jwtService.refreshToken(user);
 
+        String roles = user.getRoles().stream()
+                .map(role -> role.getUserRole().getName())
+                .collect(Collectors.joining(", "));
         AuthenticationResponse response = AuthenticationResponse.builder()
                         .name(user.getFirstName())
-                        .isEnabled(user.isEnabled())
                         .accessToken(jwtToken)
                         .refreshToken(refreshToken)
+                        .role(roles)
+                        .isEnabled(user.isEnabled())
                         .build();
 
         revokeAllUserToken(user);
@@ -145,7 +152,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
          verifyToken.getUser().setIsActive(true);
          tokenRepository.save(verifyToken);
          return AuthenticationResponse.builder()
-                    .accessToken(token)
                     .isEnabled(verifyToken.getUser().isEnabled())
                     .build();
         } else {
@@ -207,9 +213,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 saveUserToken(user,accessToken);
                 var authResponse = AuthenticationResponse
                         .builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken);
-
+                        .build();
                 new ObjectMapper().writeValue(response.getOutputStream(),authResponse);
             }
         }

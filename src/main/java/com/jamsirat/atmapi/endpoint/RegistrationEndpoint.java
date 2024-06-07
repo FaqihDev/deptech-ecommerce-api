@@ -9,6 +9,9 @@ import com.jamsirat.atmapi.repository.ITokenRepository;
 import com.jamsirat.atmapi.service.impl.JwtService;
 import com.jamsirat.atmapi.service.impl.AuthenticationServiceImpl;
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant;
+import java.util.concurrent.CompletableFuture;
+
+import com.jamsirat.atmapi.statval.enumeration.EUserRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping(value = IApplicationConstant.ContextPath.AUTHENTICATION,
@@ -37,17 +41,20 @@ public class RegistrationEndpoint {
     private final ApplicationEventPublisher publisher;
 
     @PostMapping(IApplicationConstant.Path.Authentication.REGISTER)
-    public ResponseEntity<?> register(@RequestBody RegistrationRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> register(@RequestBody RegistrationRequest request, HttpServletRequest httpServletRequest) throws ExecutionException, InterruptedException {
         var user = authenticationService.register(request,httpServletRequest);
-        var tokenUser = jwtService.generateToken(user);
-        var refreshToken = jwtService.refreshToken(user);
+
+        CompletableFuture<String>  accessTokenFuture = CompletableFuture.supplyAsync(()-> jwtService.generateToken(user));
+        CompletableFuture<String>  refreshTokenFuture = CompletableFuture.supplyAsync(()-> jwtService.refreshToken(user));
+
         publisher.publishEvent(new RegistrationCompleteEvent(user, authenticationService.applicationUrl(httpServletRequest)));
 
         AuthenticationResponse response = AuthenticationResponse.builder()
                 .name(user.getFirstName() + " " + user.getLastName())
                 .isEnabled(user.getIsActive())
-                .accessToken(tokenUser)
-                .refreshToken(refreshToken)
+                .accessToken(accessTokenFuture.get())
+                .refreshToken(refreshTokenFuture.get())
+                .role(EUserRole.USER.getName())
                 .build();
 
         return ResponseEntity.created(URI.create("")).body(

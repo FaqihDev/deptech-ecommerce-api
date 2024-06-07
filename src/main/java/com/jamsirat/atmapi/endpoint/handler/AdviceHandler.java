@@ -65,7 +65,7 @@ public class AdviceHandler {
                     .status(HttpStatus.BAD_REQUEST)
                     .developerMessage("Please choose another email")
                     .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .message("User is already exist")
+                    .message(e.getExceptionMessage())
                     .build();
         }
 
@@ -77,7 +77,7 @@ public class AdviceHandler {
                     .status(HttpStatus.FORBIDDEN)
                     .developerMessage("Please verify your account to the link we sent")
                     .statusCode(HttpStatus.FORBIDDEN.value())
-                    .message("User is not activated")
+                    .message(e.getExceptionMessage())
                     .build();
         }
 
@@ -88,7 +88,7 @@ public class AdviceHandler {
                     .timeStamp(LocalDateTime.now().toString())
                     .status(HttpStatus.UNAUTHORIZED)
                     .statusCode(HttpStatus.UNAUTHORIZED.value())
-                    .message("Invalid username or password")
+                    .message(e.getExceptionMessage())
                     .build();
         }
 
@@ -100,7 +100,7 @@ public class AdviceHandler {
                     .status(HttpStatus.NOT_FOUND)
                     .statusCode(HttpStatus.NOT_FOUND.value())
                     .developerMessage("Please verify your account")
-                    .message("User is not found")
+                    .message(e.getExceptionMessage())
                     .build();
         }
 
@@ -112,7 +112,31 @@ public class AdviceHandler {
                     .status(HttpStatus.NOT_FOUND)
                     .statusCode(HttpStatus.NOT_FOUND.value())
                     .developerMessage("")
-                    .message("Token is invalid !")
+                    .message(e.getExceptionMessage())
                     .build();
         }
+
+    @ExceptionHandler(RoleHasBeenAddedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public HttpResponse UserNotFoundException(RoleHasBeenAddedException e) {
+        return HttpResponse.builder()
+                .timeStamp(LocalDateTime.now().toString())
+                .status(HttpStatus.BAD_REQUEST)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .developerMessage("No need to add that role")
+                .message(e.getExceptionMessage())
+                .build();
     }
+
+    @ExceptionHandler(UnauthorizedGrantingAccessException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public HttpResponse UserNotFoundException(UnauthorizedGrantingAccessException e) {
+        return HttpResponse.builder()
+                .timeStamp(LocalDateTime.now().toString())
+                .status(HttpStatus.UNAUTHORIZED)
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .developerMessage("You are not authorized to access this resource")
+                .message(e.getExceptionMessage())
+                .build();
+    }
+}

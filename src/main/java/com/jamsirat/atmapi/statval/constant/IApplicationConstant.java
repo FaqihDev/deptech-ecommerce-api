@@ -6,6 +6,7 @@ public interface IApplicationConstant {
         String ORDER = "/v1/order-service";
         String USER = "/v1/user-service";
         String AUTHENTICATION = "/api/v1/auth";
+        String AUTHORIZATION = "/api/v1/grant";
     }
 
     interface Path{
@@ -17,6 +18,10 @@ public interface IApplicationConstant {
 
         interface User {
             String ADD_USER ="/user";
+        }
+
+        interface Authorization {
+            String GRANT_ACCESS ="/grant-access";
         }
 
         interface Authentication {

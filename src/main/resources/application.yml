@@ -15,7 +15,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/atm
     username: jamsirat
-    password: passwordjamsirat
+    password: jamsirat
   mail:
     host: smtp.gmail.com
     port: 587

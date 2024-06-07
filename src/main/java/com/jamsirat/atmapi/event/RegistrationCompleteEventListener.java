@@ -8,8 +8,11 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -17,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@EnableAsync
 public class RegistrationCompleteEventListener implements ApplicationListener<RegistrationCompleteEvent> {
 
     private final ITokenRepository tokenRepository;
@@ -25,9 +29,11 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
 
 
     @Override
+    @Async
     public void onApplicationEvent(RegistrationCompleteEvent event) {
         user = event.getUser();
-        var verificationToken = tokenRepository.findAllByValidToken(user.getId());
+        var verificationTokens = tokenRepository.findAllByValidToken(user.getId());
+        String verificationToken = verificationTokens.stream().map(x-> x.getToken()).findFirst().get();
         String url = event.getApplicationUrl() + "/auth/v1/register/verifyEmail?token=" + verificationToken;
 
         try {

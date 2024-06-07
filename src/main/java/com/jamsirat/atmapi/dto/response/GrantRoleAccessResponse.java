@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class GrantRoleAccessResponse implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -3520219122397523027L;
+    private static final long serialVersionUID = 6223339341729736414L;
 
     private String message;
     private String roleName;
