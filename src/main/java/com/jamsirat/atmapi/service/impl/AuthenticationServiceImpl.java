@@ -62,7 +62,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 roles.add(userRole);
             }
         } catch (DataNotFoundException e) {
-            log.error("Error find Role by Code {} : {} " + EUserRole.USER, e.toString());
+            log.error("Error find Role by Code {} : {} %s".formatted(EUserRole.USER), e.toString());
             throw new DataNotFoundException(404,"Role not found");
         }
 
