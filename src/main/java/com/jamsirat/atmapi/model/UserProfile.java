@@ -20,14 +20,9 @@ public class UserProfile extends BaseMasterData implements Serializable {
     @Serial
     private static final long serialVersionUID = -4474084425849609899L;
 
-    @Column(name = "email")
-    private String email;
 
     @Column(name = "is_email_verified")
     private Boolean isEmailVerified;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
 
     @Column(name = "is_mobile_phone_number_verified")
     private Boolean isMobilePhoneNumberVerified;

@@ -16,16 +16,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Setter
 @Getter
-public class UserProfileExtended implements Serializable {
+public class UserProfileExtended extends BaseMasterData implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 5773885358142110306L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(allocationSize = 1,initialValue = 1,name = "user_profile_extended_id_seq")
-    @Column(name = "id")
-    private Long id;
 
     @Column(name = "full_name")
     private String fullName;
@@ -46,6 +41,17 @@ public class UserProfileExtended implements Serializable {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "origin")
+    private String origin;
+
+    @Column(name = "height")
+    private String height;
+
+    @Column(name = "image")
+    private String image;
 
     @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_profile")
