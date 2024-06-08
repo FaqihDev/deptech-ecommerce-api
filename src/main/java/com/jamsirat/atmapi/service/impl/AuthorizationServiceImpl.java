@@ -36,7 +36,7 @@ public class AuthorizationServiceImpl implements IAuthorizationService {
             throw new UnauthorizedGrantingAccessException(401,"You are not allowed to grant access role");
         }
         if (user.getRoles().stream().anyMatch(role -> role.getId().equals(roleId))) {
-            throw new RoleHasBeenAddedException(401,String.format("Role %s has been added to user %s",newRole,user));
+            throw new RoleHasBeenAddedException(401,String.format("Role %s has been added to user %s",newRole.getRoleName(),user.getFirstName()));
         }
         user.getRoles().add(newRole);
         userRepository.save(user);
@@ -52,10 +52,9 @@ public class AuthorizationServiceImpl implements IAuthorizationService {
     @Override
     public List<String> getRolesByLoggedInUser(Principal principal) {
         Set<Role> roles = getLoggedInUser(principal).getRoles();
-        List<String> rolesName = roles.stream()
+        return roles.stream()
                 .map(Role::getRoleName)
                 .toList();
-        return rolesName;
     }
 
     private User getLoggedInUser(Principal principal) {

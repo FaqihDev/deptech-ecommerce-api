@@ -19,7 +19,7 @@ public class AdviceHandler {
                     .timeStamp(LocalDateTime.now().toString())
                     .status(HttpStatus.NOT_FOUND)
                     .statusCode(HttpStatus.NOT_FOUND.value())
-                    .message("Data not found")
+                    .message(e.getExceptionMessage())
                     .build();
         }
 
@@ -30,7 +30,7 @@ public class AdviceHandler {
                     .timeStamp(LocalDateTime.now().toString())
                     .status(HttpStatus.NOT_FOUND)
                     .statusCode(HttpStatus.NOT_FOUND.value())
-                    .message("Sorry, we are out of stock")
+                    .message(e.getExceptionMessage())
                     .build();
         }
 
@@ -41,7 +41,7 @@ public class AdviceHandler {
                     .timeStamp(LocalDateTime.now().toString())
                     .status(HttpStatus.BAD_REQUEST)
                     .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .message("Email is already verified")
+                    .message(e.getExceptionMessage())
                     .developerMessage("Please login to your account")
                     .build();
         }
@@ -94,7 +94,7 @@ public class AdviceHandler {
 
         @ExceptionHandler(UserNotFoundException.class)
         @ResponseStatus(HttpStatus.NOT_FOUND)
-        public HttpResponse UserNotFoundException(UserNotFoundException e) {
+        public HttpResponse UnauhtorizedGrantRole(UserNotFoundException e) {
             return HttpResponse.builder()
                     .timeStamp(LocalDateTime.now().toString())
                     .status(HttpStatus.NOT_FOUND)
@@ -106,7 +106,7 @@ public class AdviceHandler {
 
         @ExceptionHandler(InvalidTokenException.class)
         @ResponseStatus(HttpStatus.NOT_FOUND)
-        public HttpResponse UserNotFoundException(InvalidTokenException e) {
+        public HttpResponse UnauhtorizedGrantRole(InvalidTokenException e) {
             return HttpResponse.builder()
                     .timeStamp(LocalDateTime.now().toString())
                     .status(HttpStatus.NOT_FOUND)
@@ -118,24 +118,36 @@ public class AdviceHandler {
 
     @ExceptionHandler(RoleHasBeenAddedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public HttpResponse UserNotFoundException(RoleHasBeenAddedException e) {
+    public HttpResponse UserHasBeenGranted(RoleHasBeenAddedException e) {
         return HttpResponse.builder()
                 .timeStamp(LocalDateTime.now().toString())
                 .status(HttpStatus.BAD_REQUEST)
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .developerMessage("No need to add that role")
+                .developerMessage(e.getExceptionMessage())
                 .message(e.getExceptionMessage())
                 .build();
     }
 
     @ExceptionHandler(UnauthorizedGrantingAccessException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public HttpResponse UserNotFoundException(UnauthorizedGrantingAccessException e) {
+    public HttpResponse UnauhtorizedGrantRole(UnauthorizedGrantingAccessException e) {
         return HttpResponse.builder()
                 .timeStamp(LocalDateTime.now().toString())
                 .status(HttpStatus.UNAUTHORIZED)
                 .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .developerMessage("You are not authorized to access this resource")
+                .message(e.getExceptionMessage())
+                .build();
+    }
+
+    @ExceptionHandler(EmailNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public HttpResponse UnauhtorizedGrantRole(EmailNotValidException e) {
+        return HttpResponse.builder()
+                .timeStamp(LocalDateTime.now().toString())
+                .status(HttpStatus.BAD_REQUEST)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .developerMessage("Please specify another email")
                 .message(e.getExceptionMessage())
                 .build();
     }

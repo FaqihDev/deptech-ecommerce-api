@@ -46,6 +46,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailValidatorServiceImpl emailValidatorService;
 
 
 
@@ -70,20 +71,24 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                throw new UserAlreadyExistException("user is already taken","msg");
            }
 
-        var user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .userName(request.getEmail())
-                .isActive(false)
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles(roles)
-                .build();
-       roleRepository.saveAll(roles);
-       var currentUser = userRepository.save(user);
-       var jwtToken = jwtService.generateToken(currentUser);
-       saveUserToken(currentUser,jwtToken);
-
-       return currentUser;
+           var validateEmail = emailValidatorService.validateAll(request.getEmail());
+             if(validateEmail) {
+                 var user = User.builder()
+                         .firstName(request.getFirstName())
+                         .lastName(request.getLastName())
+                         .userName(request.getEmail())
+                         .isActive(false)
+                         .password(passwordEncoder.encode(request.getPassword()))
+                         .roles(roles)
+                         .build();
+                 roleRepository.saveAll(roles);
+                 var currentUser = userRepository.save(user);
+                 var jwtToken = jwtService.generateToken(currentUser);
+                 saveUserToken(currentUser,jwtToken);
+                 return currentUser;
+             } else {
+                 throw new EmailNotValidException(404,"Email is not valid");
+             }
     }
 
 
