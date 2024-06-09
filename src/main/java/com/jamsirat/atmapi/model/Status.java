@@ -1,7 +1,6 @@
 package com.jamsirat.atmapi.model;
 
 import com.jamsirat.atmapi.statval.enumeration.EDapuanLevel;
-import com.jamsirat.atmapi.statval.enumeration.EProgressStatus;
 import com.jamsirat.atmapi.statval.enumeration.EStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,10 +27,6 @@ public class Status extends BaseMasterData implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private EStatus status;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "progress_status")
-    private EProgressStatus progressStatus;
 
     @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
