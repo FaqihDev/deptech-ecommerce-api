@@ -1,5 +1,7 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.profile;
 
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
+import com.jamsirat.atmapi.model.auth.User;
 import com.jamsirat.atmapi.statval.enumeration.EDapuanLevel;
 import com.jamsirat.atmapi.statval.enumeration.EStatus;
 import jakarta.persistence.*;
@@ -28,9 +30,8 @@ public class Status extends BaseMasterData implements Serializable {
     @Column(name = "status")
     private EStatus status;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
-
+    @JoinColumn(name = "user_profile_extended_id")
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private UserProfileExtended userProfileExtendedId;
 
 }

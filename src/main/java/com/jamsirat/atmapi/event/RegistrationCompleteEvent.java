@@ -1,6 +1,6 @@
 package com.jamsirat.atmapi.event;
 
-import com.jamsirat.atmapi.model.User;
+import com.jamsirat.atmapi.model.auth.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;

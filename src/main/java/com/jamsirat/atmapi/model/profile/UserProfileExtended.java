@@ -1,5 +1,8 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.profile;
 
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
+import com.jamsirat.atmapi.model.Participant;
+import com.jamsirat.atmapi.model.Principle;
 import com.jamsirat.atmapi.statval.enumeration.EGender;
 import jakarta.persistence.*;
 import lombok.*;

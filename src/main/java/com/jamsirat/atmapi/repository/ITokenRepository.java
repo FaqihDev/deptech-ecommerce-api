@@ -1,6 +1,6 @@
 package com.jamsirat.atmapi.repository;
 
-import com.jamsirat.atmapi.model.Token;
+import com.jamsirat.atmapi.model.auth.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

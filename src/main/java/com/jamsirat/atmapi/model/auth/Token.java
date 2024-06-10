@@ -1,5 +1,6 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.auth;
 
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.statval.enumeration.ETokenType;
 import jakarta.persistence.*;
 import lombok.*;

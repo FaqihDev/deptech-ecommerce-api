@@ -1,6 +1,7 @@
 package com.jamsirat.atmapi.model;
 
 
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;

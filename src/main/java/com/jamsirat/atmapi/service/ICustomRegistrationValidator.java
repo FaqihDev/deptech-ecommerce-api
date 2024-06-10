@@ -2,7 +2,7 @@ package com.jamsirat.atmapi.service;
 
 
 
-import com.jamsirat.atmapi.model.UserProfile;
+import com.jamsirat.atmapi.model.profile.UserProfile;
 import com.jamsirat.atmapi.statval.enumeration.EValidationResult;
 import org.springframework.stereotype.Service;
 

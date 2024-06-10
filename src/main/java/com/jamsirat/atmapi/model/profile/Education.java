@@ -1,5 +1,7 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.profile;
 
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
+import com.jamsirat.atmapi.model.auth.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,10 +35,8 @@ public class Education extends BaseMasterData implements Serializable {
     @Column(name = "on_going_education")
     private String onGoingEducation;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-
+    @JoinColumn(name = "user_profile_extended_id")
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private UserProfileExtended userProfileExtendedId;
 
 }

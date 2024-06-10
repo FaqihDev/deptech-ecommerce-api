@@ -1,7 +1,7 @@
 package com.jamsirat.atmapi.repository;
 
 import com.jamsirat.atmapi.exception.DataNotFoundException;
-import com.jamsirat.atmapi.model.Role;
+import com.jamsirat.atmapi.model.auth.Role;
 import com.jamsirat.atmapi.statval.enumeration.EUserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

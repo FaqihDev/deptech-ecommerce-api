@@ -1,6 +1,7 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.statval.enumeration.EUserRole;
 import jakarta.persistence.*;
 import lombok.*;

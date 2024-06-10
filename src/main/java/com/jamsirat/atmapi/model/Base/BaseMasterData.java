@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.Base;
 
 import jakarta.persistence.*;
 import lombok.Getter;
