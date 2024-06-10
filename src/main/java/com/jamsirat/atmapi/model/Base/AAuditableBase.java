@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.Base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;

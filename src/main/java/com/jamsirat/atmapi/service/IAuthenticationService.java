@@ -4,7 +4,7 @@ import com.jamsirat.atmapi.dto.request.LoginRequest;
 import com.jamsirat.atmapi.dto.request.RegistrationRequest;
 import com.jamsirat.atmapi.dto.response.AuthenticationResponse;
 import com.jamsirat.atmapi.dto.response.HttpResponse;
-import com.jamsirat.atmapi.model.User;
+import com.jamsirat.atmapi.model.auth.User;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface IAuthenticationService {

@@ -1,6 +1,7 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.profile;
 
 
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.statval.enumeration.EAgeCriteria;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,8 +31,8 @@ public class Preference extends BaseMasterData implements Serializable {
     @Column(name = "couple_job_criteria")
     private String jobCriteria;
 
-    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_profile")
-    private UserProfile userProfile;
+    @JoinColumn(name = "user_profile_extended_id")
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private UserProfileExtended userProfileExtendedId;
 
 }

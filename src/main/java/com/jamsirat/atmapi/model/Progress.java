@@ -1,8 +1,9 @@
 package com.jamsirat.atmapi.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
+import com.jamsirat.atmapi.statval.enumeration.EProgressStatus;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
@@ -16,5 +17,10 @@ import java.io.Serializable;
 @Getter
 public class Progress extends BaseMasterData implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "progress_status")
+    private EProgressStatus status;
 
 }

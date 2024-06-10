@@ -1,6 +1,8 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.profile;
 
 
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
+import com.jamsirat.atmapi.model.auth.User;
 import com.jamsirat.atmapi.statval.enumeration.EJobStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,11 +23,11 @@ public class Job extends BaseMasterData implements Serializable {
     @Column(name = "job_status")
     private EJobStatus jobStatus;
 
-    @Column(name = "address")
-    private String workAddress;
+    @Column(name = "office_address")
+    private String office_address;
 
-    @Column(name = "work_at")
-    private String workAt;
+    @Column(name = "company_name")
+    private String companyName;
 
     @Column(name = "profession")
     private String profession;
@@ -36,8 +38,8 @@ public class Job extends BaseMasterData implements Serializable {
     @Column(name = "work_time")
     private String workTime;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "user_profile_extended_id")
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private UserProfileExtended userProfileExtendedId;
 
 }

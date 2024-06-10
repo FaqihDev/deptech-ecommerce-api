@@ -1,6 +1,8 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.profile;
 
 
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
+import com.jamsirat.atmapi.model.auth.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,21 +17,20 @@ import java.io.Serializable;
 @Getter
 public class Domicile extends BaseMasterData implements Serializable {
 
-
     @Column(name = "kelompok_sambung")
     private String kelompokSambung;
 
     @Column(name = "desa_sambung")
     private String desaSambung;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @Column(name = "kelompok_address")
     private String kelompokAddress;
 
-    @Column(name = "desaAddress")
+    @Column(name = "desa_address")
     private String desaAddress;
+
+    @JoinColumn(name = "user_profile_extended_id")
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private UserProfileExtended userProfileExtendedId;
 
 }

@@ -1,6 +1,8 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.auth;
 
 
+import com.jamsirat.atmapi.model.Base.BaseMasterData;
+import com.jamsirat.atmapi.model.profile.UserProfile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
