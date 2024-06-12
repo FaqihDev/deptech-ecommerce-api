@@ -1,6 +1,7 @@
 package com.jamsirat.atmapi.model.profile;
 
 
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.model.auth.User;
 import com.jamsirat.atmapi.statval.enumeration.EJobStatus;
@@ -16,7 +17,7 @@ import java.io.Serializable;
 @Builder
 @Setter
 @Getter
-public class Job extends BaseMasterData implements Serializable {
+public class Job extends AAuditableBase implements Serializable {
 
 
     @Enumerated(EnumType.STRING)

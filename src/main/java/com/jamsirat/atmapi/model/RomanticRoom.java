@@ -1,5 +1,6 @@
 package com.jamsirat.atmapi.model;
 
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +15,7 @@ import java.io.Serializable;
 @Builder
 @Setter
 @Getter
-public class RomanticRoom extends BaseMasterData implements Serializable {
+public class RomanticRoom extends AAuditableBase implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

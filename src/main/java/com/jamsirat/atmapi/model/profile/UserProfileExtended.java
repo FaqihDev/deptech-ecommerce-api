@@ -1,5 +1,6 @@
 package com.jamsirat.atmapi.model.profile;
 
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.model.Participant;
 import com.jamsirat.atmapi.model.Principle;
@@ -19,7 +20,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Setter
 @Getter
-public class UserProfileExtended extends BaseMasterData implements Serializable {
+public class UserProfileExtended extends AAuditableBase implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 5773885358142110306L;

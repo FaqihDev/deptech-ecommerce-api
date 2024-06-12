@@ -151,4 +151,16 @@ public class AdviceHandler {
                 .message(e.getExceptionMessage())
                 .build();
     }
+
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public HttpResponse UnauhtorizedEmailUser(EmailNotVerifiedException e) {
+        return HttpResponse.builder()
+                .timeStamp(LocalDateTime.now().toString())
+                .status(HttpStatus.UNAUTHORIZED)
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .developerMessage("Please Verify your account, by the link we sent!")
+                .message(e.getExceptionMessage())
+                .build();
+    }
 }

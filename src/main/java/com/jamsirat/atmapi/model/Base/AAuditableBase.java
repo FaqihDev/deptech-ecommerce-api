@@ -21,7 +21,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class AAuditableBase {
+public abstract class AAuditableBase extends BaseMasterData<Long> {
 
 
     @CreatedBy

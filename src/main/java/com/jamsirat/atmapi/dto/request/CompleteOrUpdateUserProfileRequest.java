@@ -10,9 +10,9 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompleteUserProfileRequest {
+public class CompleteOrUpdateUserProfileRequest {
 
-
+    private Long userId;
     private String birthPlace;
     private LocalDate birthDate;
     private String gender;
@@ -24,7 +24,5 @@ public class CompleteUserProfileRequest {
     private String desaSambung;
     private String kelompokAddress;
     private String desaAddress;
-
-
 
 }

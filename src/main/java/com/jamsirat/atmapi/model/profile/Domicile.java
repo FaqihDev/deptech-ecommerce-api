@@ -1,6 +1,7 @@
 package com.jamsirat.atmapi.model.profile;
 
 
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.model.auth.User;
 import jakarta.persistence.*;
@@ -15,7 +16,7 @@ import java.io.Serializable;
 @Builder
 @Setter
 @Getter
-public class Domicile extends BaseMasterData implements Serializable {
+public class Domicile extends AAuditableBase implements Serializable {
 
     @Column(name = "kelompok_sambung")
     private String kelompokSambung;
