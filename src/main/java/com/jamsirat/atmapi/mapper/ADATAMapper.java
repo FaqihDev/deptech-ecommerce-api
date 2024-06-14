@@ -42,5 +42,12 @@ public abstract class ADATAMapper<SOURCE,TARGET> implements IDATAMapper<SOURCE,T
 
     public abstract TARGET convert(SOURCE source);
 
+    public Page<TARGET> entitiesPageIntoDTOPage(Page<SOURCE> data) {
+        return new PageImpl<>(
+                entitiesIntoDTOs(data.getContent()),
+                data.getPageable(), data.getTotalElements()
+        );
+    }
+
 
 }
