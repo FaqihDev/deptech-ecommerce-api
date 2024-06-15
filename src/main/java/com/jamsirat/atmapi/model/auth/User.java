@@ -65,6 +65,7 @@ public class User extends AAuditableBase implements UserDetails, Serializable {
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
+
     public User(Set<String> roleNames, String firstName, String lastName, String userName, String password, Boolean isActive) {
         this.roles = roleNames.stream()
                 .map(Role::new)

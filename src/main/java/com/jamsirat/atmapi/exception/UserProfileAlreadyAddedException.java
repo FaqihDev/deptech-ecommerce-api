@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleHasBeenAddedException extends RuntimeException implements CustomException {
+public class UserProfileAlreadyAddedException extends RuntimeException implements CustomException{
 
     private String exceptionMessage;
     private String developerMessage;
+
 }

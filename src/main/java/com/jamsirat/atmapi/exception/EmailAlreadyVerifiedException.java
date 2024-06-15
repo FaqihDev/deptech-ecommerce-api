@@ -7,9 +7,9 @@ import org.springframework.security.core.AuthenticationException;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailAlreadyVerifiedException extends RuntimeException {
+public class EmailAlreadyVerifiedException extends RuntimeException implements CustomException {
 
-    private Integer responseCode;
     private String exceptionMessage;
+    private String developerMessage;
 
 }

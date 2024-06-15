@@ -10,8 +10,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailNotVerifiedException extends RuntimeException {
+public class EmailNotVerifiedException extends RuntimeException implements CustomException {
 
-    private Integer responseCode;
     private String exceptionMessage;
+    private String developerMessage;
 }

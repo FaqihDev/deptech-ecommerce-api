@@ -6,18 +6,19 @@ import org.springframework.security.core.AuthenticationException;
 
 @Getter
 @Setter
-public class UserNotActivatedException extends AuthenticationException {
+public class UserNotActivatedException extends AuthenticationException implements CustomException {
 
-    private Integer responseCode;
     private String exceptionMessage;
+    private String developerMessage;
 
-    public UserNotActivatedException(String msg, Throwable cause) {
+    public UserNotActivatedException(String msg, Throwable cause, String developerMessage) {
         super(msg, cause);
-        this.responseCode = 401;
         this.exceptionMessage = msg;
+        this.developerMessage = developerMessage;
     }
 
-    public UserNotActivatedException(String msg) {
+    public UserNotActivatedException(String msg,String developerMessage) {
         super(msg);
+        this.developerMessage = developerMessage;
     }
 }

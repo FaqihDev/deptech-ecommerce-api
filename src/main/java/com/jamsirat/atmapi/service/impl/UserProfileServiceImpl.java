@@ -17,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserProfileServiceImpl implements IUserProfileService {
@@ -32,11 +30,13 @@ public class UserProfileServiceImpl implements IUserProfileService {
     @Override
     public CompleteUserProfileResponse completeUserProfile(CompleteOrUpdateUserProfileRequest request) {
         var userId = userRepository.findById(request.getUserId()).orElseThrow(()
-                -> new DataNotFoundException(404,String.format("User with id %s is not found{}",request.getUserId())));
+                -> new DataNotFoundException(String.format("User with id %s is not found{}",request.getUserId()), "Please choose another user"));
 
         if (Boolean.FALSE.equals(userId.getIsActive())) {
-            throw new EmailNotVerifiedException(401,"Email is not verified!");
+            throw new EmailNotVerifiedException("Email is not verified!","Please verify you account");
         }
+
+        //todo : handle once userprofile is already added
 
         var userProfile = UserProfile.builder()
                 .user(userId)
@@ -72,6 +72,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
         return CompleteUserProfileResponse
                 .builder()
+                .userId(userId.getId())
                 .fullName(userProfileExtended.getFullName())
                 .build();
     }

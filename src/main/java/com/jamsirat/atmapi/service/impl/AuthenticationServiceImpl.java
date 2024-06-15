@@ -63,12 +63,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             }
         } catch (DataNotFoundException e) {
             log.error("Error find Role by Code {} : {} %s".formatted(EUserRole.USER), e.toString());
-            throw new DataNotFoundException(404,"Role not found");
+            throw new DataNotFoundException("Role not found","Please make sure your account id is correct!");
         }
 
            var existUser = userRepository.findByUserName(request.getEmail());
            if (existUser.isPresent()) {
-               throw new UserAlreadyExistException("user is already taken","msg");
+               throw new UserAlreadyExistException("user is already taken","Please choose another email!");
            }
 
            var validateEmail = emailValidatorService.validateAll(request.getEmail());
@@ -87,7 +87,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                  saveUserToken(currentUser,jwtToken);
                  return currentUser;
              } else {
-                 throw new EmailNotValidException(404,"Email is not valid");
+                 throw new EmailNotValidException("Email is not valid","ExampleEmail : xxx@gmail.com");
              }
     }
 
@@ -111,7 +111,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
           authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword()));
        } catch (UserNotActivatedException e) {
            log.info("Authentication failed : {} ", e.getMessage());
-           throw new UserNotActivatedException("User is not activated yet");
+           throw new UserNotActivatedException("User is not activated yet", "Please verify your account");
        } catch (org.springframework.security.authentication.BadCredentialsException e) {
            throw new BadCredentialsException("Invalid username or password");
        } catch (UserNotFoundException e) {
@@ -149,7 +149,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public AuthenticationResponse verifyEmail(String token) {
         var verifyToken  = tokenRepository.findByToken(token).orElseThrow(()-> new IllegalArgumentException("Invalid token"));
         if (verifyToken.getUser().isEnabled()) {
-            throw new EmailAlreadyVerifiedException(401,"Email is already verified please login!");
+            throw new EmailAlreadyVerifiedException("Email is already verified!","Please do login");
         }
 
 
@@ -166,10 +166,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     @Override
     public String validateToken(String token) {
-        var tokenVerifiy = tokenRepository.findByToken(token).orElseThrow(() -> new InvalidTokenException(404,"Token is invalid"));
+        var tokenVerifiy = tokenRepository.findByToken(token).orElseThrow(() -> new InvalidTokenException("Token is invalid","Please do login"));
         var user = tokenVerifiy.getUser();
         if (!jwtService.isTokenValid(tokenVerifiy.token, user)) {
-            throw new InvalidTokenException(404,"Token is invalid");
+            throw new InvalidTokenException("Token is invalid","Please do login");
         }
 
         user.setIsActive(true);

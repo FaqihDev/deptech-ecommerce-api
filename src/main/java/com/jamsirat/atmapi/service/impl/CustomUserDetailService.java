@@ -23,7 +23,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
         if (!user.getIsActive()) {
             try {
-                throw new UserNotActivatedException("User is not activated yet");
+                throw new UserNotActivatedException("User is not activated yet","Please verify your account!");
             } catch (UserNotActivatedException e) {
                 throw new RuntimeException(e);
             }
