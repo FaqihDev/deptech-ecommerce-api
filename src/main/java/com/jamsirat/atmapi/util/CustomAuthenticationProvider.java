@@ -35,7 +35,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         if (!user.isAccountNonLocked()) {
-            throw new UserNotActivatedException("User is not activated yet");
+            throw new UserNotActivatedException("User is not activated yet","Please verify your account");
         }
 
         if (!password.equals(user.getPassword())) {

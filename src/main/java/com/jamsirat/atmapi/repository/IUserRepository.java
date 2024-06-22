@@ -2,6 +2,7 @@ package com.jamsirat.atmapi.repository;
 
 import com.jamsirat.atmapi.model.auth.Role;
 import com.jamsirat.atmapi.model.auth.User;
+import com.jamsirat.atmapi.model.profile.UserProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,4 +16,6 @@ public interface IUserRepository extends JpaRepository<User,Long> {
     Optional<User> findByUserName(String username);
 
     Set<Role> findRolesById(@Param("userId") Long userId);
+
+    Optional<UserProfile> findByUserProfile(UserProfile userProfile);
 }

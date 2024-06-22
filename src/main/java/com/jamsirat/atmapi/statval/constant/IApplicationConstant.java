@@ -7,6 +7,7 @@ public interface IApplicationConstant {
         String USER = "/v1/user-service";
         String AUTHENTICATION = "/api/v1/auth";
         String AUTHORIZATION = "/api/v1/grant";
+        String USER_PROFILE = "/api/v1/user";
     }
 
     interface Path{
@@ -17,7 +18,9 @@ public interface IApplicationConstant {
         }
 
         interface User {
-            String ADD_USER ="/user";
+            String COMPLETE_PROFILE ="/complete-profile";
+            String UPDATE_PROFILE ="/update-profile";
+
         }
 
         interface Authorization {

@@ -1,5 +1,6 @@
 package com.jamsirat.atmapi.model.profile;
 
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.model.auth.User;
 import com.jamsirat.atmapi.statval.enumeration.EDapuanLevel;
@@ -16,7 +17,7 @@ import java.io.Serializable;
 @Builder
 @Setter
 @Getter
-public class Status extends BaseMasterData implements Serializable {
+public class Status extends AAuditableBase implements Serializable {
 
 
     @Column(name = "dapuan")

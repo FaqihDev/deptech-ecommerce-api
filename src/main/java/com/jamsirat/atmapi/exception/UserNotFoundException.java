@@ -6,15 +6,15 @@ import org.springframework.security.core.AuthenticationException;
 
 @Getter
 @Setter
-public class UserNotFoundException extends AuthenticationException {
+public class UserNotFoundException extends AuthenticationException implements CustomException{
 
-    private Integer responseCode;
     private String exceptionMessage;
+    private String developerMessage;
 
-    public UserNotFoundException(String msg, Throwable cause) {
+    public UserNotFoundException(String msg, Throwable cause,String developerMessage ) {
         super(msg, cause);
-        this.responseCode = 401;
         this.exceptionMessage = msg;
+        this.developerMessage = developerMessage;
     }
 
     public UserNotFoundException(String msg) {

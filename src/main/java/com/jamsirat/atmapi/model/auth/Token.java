@@ -1,5 +1,6 @@
 package com.jamsirat.atmapi.model.auth;
 
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.statval.enumeration.ETokenType;
 import jakarta.persistence.*;
@@ -16,7 +17,7 @@ import java.io.Serializable;
 @Builder
 @Setter
 @Getter
-public class Token extends BaseMasterData implements Serializable {
+public class Token extends AAuditableBase implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 3201884138615687279L;

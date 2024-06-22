@@ -6,15 +6,15 @@ import org.springframework.security.core.AuthenticationException;
 
 @Setter
 @Getter
-public class BadCredentialsException extends AuthenticationException {
+public class BadCredentialsException extends AuthenticationException implements CustomException {
 
-    private Integer responseCode;
     private String exceptionMessage;
+    private String developerMessage;
 
-    public BadCredentialsException(String msg, Throwable cause) {
+    public BadCredentialsException(String msg, Throwable cause, String developerMessage) {
         super(msg, cause);
-        this.responseCode = 401;
         this.exceptionMessage = msg;
+        this.developerMessage = developerMessage;
 
     }
 

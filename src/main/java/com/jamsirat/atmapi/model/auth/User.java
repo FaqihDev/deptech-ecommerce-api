@@ -1,6 +1,7 @@
 package com.jamsirat.atmapi.model.auth;
 
 
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.model.profile.UserProfile;
 import jakarta.persistence.*;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @Setter
 @Getter
 @Table(name = "users")
-public class User extends BaseMasterData implements UserDetails, Serializable {
+public class User extends AAuditableBase implements UserDetails, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1149799443782698228L;
@@ -63,6 +64,7 @@ public class User extends BaseMasterData implements UserDetails, Serializable {
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
+
 
     public User(Set<String> roleNames, String firstName, String lastName, String userName, String password, Boolean isActive) {
         this.roles = roleNames.stream()

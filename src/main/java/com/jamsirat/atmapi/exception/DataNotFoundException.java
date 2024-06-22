@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DataNotFoundException extends RuntimeException{
+public class DataNotFoundException extends RuntimeException implements CustomException{
 
-    private Integer responseCode;
+
     private String exceptionMessage;
+    private String developerMessage;
+
 
 }

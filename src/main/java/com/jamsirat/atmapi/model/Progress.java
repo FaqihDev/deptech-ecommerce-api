@@ -1,9 +1,10 @@
 package com.jamsirat.atmapi.model;
 
 
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.jamsirat.atmapi.statval.enumeration.EProgressStatus;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
@@ -15,7 +16,12 @@ import java.io.Serializable;
 @Builder
 @Setter
 @Getter
-public class Progress extends BaseMasterData implements Serializable {
+public class Progress extends AAuditableBase implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "progress_status")
+    private EProgressStatus status;
 
 }

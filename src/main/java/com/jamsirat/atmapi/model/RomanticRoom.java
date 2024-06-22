@@ -1,5 +1,6 @@
 package com.jamsirat.atmapi.model;
 
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,21 +15,25 @@ import java.io.Serializable;
 @Builder
 @Setter
 @Getter
-public class RomanticRoom extends BaseMasterData implements Serializable {
+public class RomanticRoom extends AAuditableBase implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "men_couple")
-    private Participant maleCouple;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "male_couple")
+    private Participant maleCoupleId;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "women_couple")
-    private Participant femaleCouple;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "female_couple")
+    private Participant femaleCoupleId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "progress_id")
+    private Progress progressId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "managed_by")
+    @JoinColumn(name = "principle_id")
     private Principle managedBy;
 
 }

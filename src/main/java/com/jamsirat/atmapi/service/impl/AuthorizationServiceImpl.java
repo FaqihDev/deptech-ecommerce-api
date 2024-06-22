@@ -29,14 +29,14 @@ public class AuthorizationServiceImpl implements IAuthorizationService {
     @Override
     @Transactional
     public GrantRoleAccessResponse giveAccessToUser(Long userId, Long roleId, Principal principal) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException(404,"User is not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User is not found","Please verify your account"));
         List<String> activeRoles = getRolesByLoggedInUser(principal);
-        Role newRole = roleRepository.findById(roleId).orElseThrow(() -> new DataNotFoundException(404,"Specified role does not exist"));
+        Role newRole = roleRepository.findById(roleId).orElseThrow(() -> new DataNotFoundException("Specified role does not exist","please verify your account"));
         if (user.getIsActive() == Boolean.TRUE && !activeRoles.contains(EUserRole.ADMIN.getName())) {
-            throw new UnauthorizedGrantingAccessException(401,"You are not allowed to grant access role");
+            throw new UnauthorizedGrantingAccessException("You are not allowed to grant access role","User role is not granted");
         }
         if (user.getRoles().stream().anyMatch(role -> role.getId().equals(roleId))) {
-            throw new RoleHasBeenAddedException(401,String.format("Role %s has been added to user %s",newRole.getRoleName(),user.getFirstName()));
+            throw new RoleHasBeenAddedException(String.format("Role %s has been added to user %s",newRole.getRoleName(),user.getFirstName()),"No need to add role");
         }
         user.getRoles().add(newRole);
         userRepository.save(user);

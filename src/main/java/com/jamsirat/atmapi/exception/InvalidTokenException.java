@@ -10,9 +10,9 @@ import org.springframework.security.core.AuthenticationException;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class InvalidTokenException extends RuntimeException {
+public class InvalidTokenException extends RuntimeException implements CustomException {
 
-    private Integer responseCode;
     private String exceptionMessage;
+    private String developerMessage;
 
 }

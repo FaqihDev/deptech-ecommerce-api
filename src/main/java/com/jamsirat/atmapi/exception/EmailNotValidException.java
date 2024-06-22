@@ -10,8 +10,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailNotValidException extends RuntimeException {
+public class EmailNotValidException extends RuntimeException implements CustomException {
 
-    private Integer responseCode;
+
     private String exceptionMessage;
+    private String developerMessage;
 }

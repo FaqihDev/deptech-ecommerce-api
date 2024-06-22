@@ -1,6 +1,7 @@
 package com.jamsirat.atmapi.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.Base.BaseMasterData;
 import com.jamsirat.atmapi.statval.enumeration.EUserRole;
 import jakarta.persistence.*;
@@ -19,7 +20,7 @@ import java.util.Set;
 @Builder
 @Setter
 @Getter
-public class Role extends BaseMasterData implements Serializable {
+public class Role extends AAuditableBase implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 783521278187749739L;

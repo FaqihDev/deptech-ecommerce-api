@@ -1,9 +1,7 @@
 package com.jamsirat.atmapi.model.Base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,26 +21,28 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class AAuditableBase {
+public abstract class AAuditableBase extends BaseMasterData<Long> {
 
-    @JsonIgnore
+
     @CreatedBy
     @Column(name = "created_by")
     protected Long createdBy;
 
-    @JsonIgnore
+
     @CreatedDate
     @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
     protected Date createdAt;
 
-    @JsonIgnore
+
     @LastModifiedBy
     @Column(name = "modified_by")
     protected Long modifiedBy;
 
-    @JsonIgnore
+
     @LastModifiedDate
     @Column(name = "modified_on")
+    @Temporal(TemporalType.TIMESTAMP)
     protected Date modifiedOn;
 
 }

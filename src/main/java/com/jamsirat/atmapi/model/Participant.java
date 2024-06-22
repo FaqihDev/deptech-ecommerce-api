@@ -1,6 +1,6 @@
 package com.jamsirat.atmapi.model;
 
-import com.jamsirat.atmapi.model.Base.BaseMasterData;
+import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import com.jamsirat.atmapi.model.profile.UserProfileExtended;
 import com.jamsirat.atmapi.statval.enumeration.EGender;
 import jakarta.persistence.*;
@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Builder
 @Setter
 @Getter
-public class Participant extends BaseMasterData implements Serializable {
+public class Participant extends AAuditableBase implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
