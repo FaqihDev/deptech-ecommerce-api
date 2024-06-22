@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.mapper;
+package com.jamsirat.atmapi.BaseMapper;
 
 import lombok.Getter;
 import org.springframework.data.domain.*;

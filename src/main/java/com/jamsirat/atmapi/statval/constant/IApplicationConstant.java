@@ -19,6 +19,8 @@ public interface IApplicationConstant {
 
         interface User {
             String COMPLETE_PROFILE ="/complete-profile";
+            String UPDATE_PROFILE ="/update-profile";
+
         }
 
         interface Authorization {

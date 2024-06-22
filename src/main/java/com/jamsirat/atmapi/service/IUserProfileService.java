@@ -1,10 +1,11 @@
 package com.jamsirat.atmapi.service;
 
 import com.jamsirat.atmapi.dto.request.CompleteOrUpdateUserProfileRequest;
-import com.jamsirat.atmapi.dto.response.CompleteUserProfileResponse;
+import com.jamsirat.atmapi.dto.response.CompleteOrUpdateUserProfileResponse;
 
 public interface IUserProfileService {
 
-    CompleteUserProfileResponse completeUserProfile(CompleteOrUpdateUserProfileRequest request);
+    CompleteOrUpdateUserProfileResponse completeUserProfile(CompleteOrUpdateUserProfileRequest request);
+    CompleteOrUpdateUserProfileResponse updateUserProfile(CompleteOrUpdateUserProfileRequest request);
 
 }
