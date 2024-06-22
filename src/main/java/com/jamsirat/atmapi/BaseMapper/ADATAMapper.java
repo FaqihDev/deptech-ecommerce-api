@@ -6,9 +6,10 @@ import org.springframework.data.domain.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Getter
 public abstract class ADATAMapper<SOURCE,TARGET> implements IDATAMapper<SOURCE,TARGET> {
 
-    @Getter
     protected boolean isBatch = false;
 
     protected void prepareData(List<SOURCE> sources) {

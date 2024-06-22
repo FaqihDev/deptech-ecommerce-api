@@ -14,14 +14,11 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public abstract class AResponseDataDTO {
 
+    @Setter
     @JsonDeserialize(converter = ResponseCodeConverter.class)
     private Integer responseCode;
     private String responseMsg;
 
-
-    public void setResponseCode(Integer value) {
-        this.responseCode = value;
-    }
 
     public void setResponseCode(HttpStatus status) {
         this.responseCode = status.value();

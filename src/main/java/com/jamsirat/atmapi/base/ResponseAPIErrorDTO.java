@@ -12,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseAPIErrorDTO extends AResponseDataDTO implements Serializable {
-    public static final long serialVersionUID =1L;
+    private static final long serialVersionUID = 1L;
     private Date timeStamp;
     private HttpStatus status;
     private String exception;

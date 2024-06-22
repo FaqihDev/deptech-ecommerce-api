@@ -30,7 +30,7 @@ public class APIResponseBuilder {
     public static <T> IResultDTO<T> ok (int statusCode, T result, String message, Map<String, String> metadata) {
         ResponseDataDTO responseDataDTO = new ResponseDataDTO();
         responseDataDTO.setResponseMsg(message);
-        responseDataDTO.setResponseCode(statusCode);
+        responseDataDTO.setResponseCode(HttpStatus.valueOf(statusCode));
 
         return ok(responseDataDTO,result,metadata);
     }
@@ -178,12 +178,4 @@ public class APIResponseBuilder {
         );
 
     }
-
-
-
-
-
-
-
-
 }

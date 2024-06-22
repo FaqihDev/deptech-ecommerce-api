@@ -4,6 +4,7 @@ package com.jamsirat.atmapi.base;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
 
@@ -19,7 +20,7 @@ public class ResponseDataDTO extends AResponseDataDTO implements Serializable {
     }
 
     public ResponseDataDTO(int responseCode, String responseMsg) {
-        this.setResponseCode(responseCode);
+        this.setResponseCode(HttpStatus.valueOf(responseCode));
         this.setResponseMsg(responseMsg);
     }
 

@@ -5,6 +5,7 @@ import com.jamsirat.atmapi.dto.response.CompleteOrUpdateUserProfileResponse;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
 import com.jamsirat.atmapi.exception.EmailNotVerifiedException;
 import com.jamsirat.atmapi.exception.UserProfileAlreadyAddedException;
+import com.jamsirat.atmapi.mapper.UserProfileMapper;
 import com.jamsirat.atmapi.model.profile.Domicile;
 import com.jamsirat.atmapi.model.profile.UserProfile;
 import com.jamsirat.atmapi.model.profile.UserProfileExtended;
@@ -27,27 +28,31 @@ public class UserProfileServiceImpl implements IUserProfileService {
     private final IUserProfileExtendedRepository userProfileExtendedRepository;
     private final IDomicileRepository domicileRepository;
     private final IUserRepository userRepository;
+    private final UserProfileMapper userProfileMapper;
 
 
     @Override
     public CompleteOrUpdateUserProfileResponse completeUserProfile(CompleteOrUpdateUserProfileRequest request) {
 
         //todo : handle once userprofile is already added
-        var userProfileByUserId = userProfileRepository.findByUserId(request.getUserId()).orElseThrow(() -> new UserProfileAlreadyAddedException(String.format("Profile with user %s is already added",request.getUserId()),"Please go to update feature to update your data"));
+        var userProfileByUserId = userProfileRepository.findByUserId(request.getUserId());
+        if (userProfileByUserId.isPresent()) {
+            throw new UserProfileAlreadyAddedException(String.format("Profile with user id %s already added",request.getUserId()),"Please go to update feature anyway!");
+        }
         var userId = userRepository.findById(request.getUserId()).orElseThrow(()-> new DataNotFoundException(String.format("User with id %s is not found{}",request.getUserId()), "Please choose another user"));
 
-            if (Boolean.FALSE.equals(userId.getIsActive())) {
+        if (Boolean.FALSE.equals(userId.getIsActive())) {
                 throw new EmailNotVerifiedException("Email is not verified!","Please verify you account");
-            }
+        }
 
-            var userProfile = UserProfile.builder()
+        var userProfile = UserProfile.builder()
                     .user(userId)
                     .isVerifiedUser(userId.getIsActive())
                     .isEmailVerified(userId.getIsActive())
                     .isMobilePhoneNumberVerified(false)
                     .build();
 
-            var userProfileExtended = UserProfileExtended.builder()
+        var userProfileExtended = UserProfileExtended.builder()
                     .fullName(userId.getFirstName() + " " + userId.getLastName())
                     .email(userId.getUsername())
                     .userProfile(userProfile)
@@ -60,7 +65,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
                     .origin(request.getOrigin())
                     .build();
 
-            var domicile = Domicile.builder()
+        var domicile = Domicile.builder()
                     .userProfileExtendedId(userProfileExtended)
                     .desaSambung(request.getDesaSambung())
                     .desaAddress(request.getDesaAddress())
@@ -68,26 +73,16 @@ public class UserProfileServiceImpl implements IUserProfileService {
                     .kelompokAddress(request.getKelompokAddress())
                     .build();
 
-            userProfileRepository.save(userProfile);
-            userProfileExtendedRepository.save(userProfileExtended);
-            domicileRepository.save(domicile);
+        userProfileRepository.save(userProfile);
+        userProfileExtendedRepository.save(userProfileExtended);
+        domicileRepository.save(domicile);
 
-        return CompleteOrUpdateUserProfileResponse
-                .builder()
-                .userId(userProfileByUserId.getUser().getId())
-                .fullName(userProfileByUserId.getUser().getFirstName() + " " + userProfileByUserId.getUser().getLastName())
-                .address(userProfileExtended.getAddress())
-                .gender(userProfileExtended.getGender().name())
-                .height(userProfileExtended.getHeight())
-                .birthDate(userProfileExtended.getBirthDate())
-                .birthPlace(userProfileExtended.getBirthPlace())
-                .phoneNumber(userProfileExtended.getPhoneNumber())
-                .origin(userProfileExtended.getOrigin())
-                .desaSambung(domicile.getDesaSambung())
-                .desaAddress(domicile.getDesaAddress())
-                .kelompokSambung(domicile.getKelompokSambung())
-                .kelompokAddress(domicile.getKelompokAddress())
-                .build();
+            if (userProfileByUserId.isPresent()) {
+                UserProfileMapper.Request requestMapper = new UserProfileMapper.Request(userProfileByUserId.get(),userProfileExtended,domicile);
+                return userProfileMapper.convert(requestMapper);
+            }
+
+        return null;
     }
 
 
@@ -112,20 +107,10 @@ public class UserProfileServiceImpl implements IUserProfileService {
         userProfileExtendedRepository.save(userProfileExtended);
         domicileRepository.save(domicile);
 
-        return CompleteOrUpdateUserProfileResponse.builder()
-                .userId(userProfileByUserId.get().getUser().getId())
-                .fullName(userProfileByUserId.get().getUser().getFirstName() + " " + userProfileByUserId.get().getUser().getLastName())
-                .address(userProfileExtended.getAddress())
-                .gender(userProfileExtended.getGender().name())
-                .height(userProfileExtended.getHeight())
-                .birthDate(userProfileExtended.getBirthDate())
-                .birthPlace(userProfileExtended.getBirthPlace())
-                .phoneNumber(userProfileExtended.getPhoneNumber())
-                .origin(userProfileExtended.getOrigin())
-                .desaSambung(domicile.getDesaSambung())
-                .desaAddress(domicile.getDesaAddress())
-                .kelompokSambung(domicile.getKelompokSambung())
-                .kelompokAddress(domicile.getKelompokAddress())
-                .build();
+        if (userProfileByUserId.isPresent()) {
+            UserProfileMapper.Request requestMapper = new UserProfileMapper.Request(userProfileByUserId.get(),userProfileExtended,domicile);
+            return userProfileMapper.convert(requestMapper);
+        }
+        return null;
     }
 }
