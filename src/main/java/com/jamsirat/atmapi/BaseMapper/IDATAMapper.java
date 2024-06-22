@@ -15,9 +15,7 @@ public interface IDATAMapper<SOURCE,TARGET> extends Converter<SOURCE,TARGET> {
 
     Slice<TARGET> entitiesIntoDTOSlices(Slice<SOURCE> sources);
 
-    ConvertResponseEntity entitiesIntoDTOConvert(SOURCE source);
-
-    Page<TARGET> entitiesIntoDTOsPage(Page<SOURCE> data);
+    ConvertResponseEntity convertWithResponseEntity(SOURCE source);
 
     Page<TARGET> entitiesPageIntoDTOPage(Page<SOURCE> data);
 

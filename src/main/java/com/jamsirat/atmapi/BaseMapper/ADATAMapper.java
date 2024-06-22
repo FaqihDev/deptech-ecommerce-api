@@ -30,18 +30,22 @@ public abstract class ADATAMapper<SOURCE,TARGET> implements IDATAMapper<SOURCE,T
     }
 
 
+    @Override
     public Page<TARGET> entitiesIntoDTOsPage(Pageable pageRequest, Page<SOURCE> entities) {
         List<TARGET> targetList = entitiesIntoDTOs(entities.getContent());
         return new PageImpl<>(targetList,pageRequest,entities.getTotalElements());
     }
 
+    @Override
     public Slice<TARGET> entitiesIntoDTOSlices(Slice<SOURCE> entities) {
         List<TARGET> targets = entitiesIntoDTOs(entities.getContent());
         return new SliceImpl<>(targets,entities.getPageable(),entities.hasNext());
     }
 
+    @Override
     public abstract TARGET convert(SOURCE source);
 
+    @Override
     public Page<TARGET> entitiesPageIntoDTOPage(Page<SOURCE> data) {
         return new PageImpl<>(
                 entitiesIntoDTOs(data.getContent()),
@@ -49,5 +53,9 @@ public abstract class ADATAMapper<SOURCE,TARGET> implements IDATAMapper<SOURCE,T
         );
     }
 
+    @Override
+    public ConvertResponseEntity convertWithResponseEntity(SOURCE source) {
+        return null;
+    }
 
 }
