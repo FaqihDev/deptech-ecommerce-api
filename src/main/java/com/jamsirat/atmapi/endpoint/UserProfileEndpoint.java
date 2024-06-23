@@ -4,6 +4,7 @@ package com.jamsirat.atmapi.endpoint;
 import com.jamsirat.atmapi.dto.request.CompleteOrUpdateUserProfileRequest;
 import com.jamsirat.atmapi.dto.response.CompleteOrUpdateUserProfileResponse;
 import com.jamsirat.atmapi.dto.response.HttpResponse;
+import com.jamsirat.atmapi.dto.response.UserProfilleDetailResponse;
 import com.jamsirat.atmapi.service.IUserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 
 import static com.jamsirat.atmapi.statval.constant.IApplicationConstant.ContextPath.USER_PROFILE;
-import static com.jamsirat.atmapi.statval.constant.IApplicationConstant.Path.User.COMPLETE_PROFILE;
-import static com.jamsirat.atmapi.statval.constant.IApplicationConstant.Path.User.UPDATE_PROFILE;
+import static com.jamsirat.atmapi.statval.constant.IApplicationConstant.Path.User.*;
 
 @RestController
 @RequestMapping(USER_PROFILE)
@@ -46,8 +46,23 @@ public class UserProfileEndpoint {
         CompleteOrUpdateUserProfileResponse data = userProfileService.updateUserProfile(request);
         return ResponseEntity.created(URI.create("")).body(
                 HttpResponse.builder()
-                        .developerMessage("Userprofile updated successfull")
-                        .message("Data saved")
+                        .developerMessage("Userprofile updated successfully")
+                        .message("Data Updated")
+                        .timeStamp(LocalDateTime.now().toString())
+                        .status(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(data)
+                        .build()
+        );
+    }
+
+    @GetMapping(GET_DETAIL_PROFILE)
+    public ResponseEntity<?> getDetailProfile(@PathVariable Long userId) {
+        UserProfilleDetailResponse data = userProfileService.getDetailUserProfile(userId);
+        return ResponseEntity.created(URI.create("")).body(
+                HttpResponse.builder()
+                        .developerMessage("Userprofile retrieved successfully")
+                        .message("User Profile")
                         .timeStamp(LocalDateTime.now().toString())
                         .status(HttpStatus.OK)
                         .statusCode(HttpStatus.OK.value())

@@ -63,7 +63,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             }
         } catch (DataNotFoundException e) {
             log.error("Error find Role by Code {} : {} %s".formatted(EUserRole.USER), e.toString());
-            throw new DataNotFoundException("Role not found","Please make sure your account id is correct!");
+            throw new DataNotFoundException("Role not found","Please check your database");
         }
 
            var existUser = userRepository.findByUserName(request.getEmail());

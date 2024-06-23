@@ -2,9 +2,11 @@ package com.jamsirat.atmapi.service.impl;
 
 import com.jamsirat.atmapi.dto.request.CompleteOrUpdateUserProfileRequest;
 import com.jamsirat.atmapi.dto.response.CompleteOrUpdateUserProfileResponse;
+import com.jamsirat.atmapi.dto.response.UserProfilleDetailResponse;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
 import com.jamsirat.atmapi.exception.EmailNotVerifiedException;
 import com.jamsirat.atmapi.exception.UserProfileAlreadyAddedException;
+import com.jamsirat.atmapi.mapper.UserProfileDetailMapper;
 import com.jamsirat.atmapi.mapper.UserProfileMapper;
 import com.jamsirat.atmapi.model.profile.Domicile;
 import com.jamsirat.atmapi.model.profile.UserProfile;
@@ -19,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -29,6 +33,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
     private final IDomicileRepository domicileRepository;
     private final IUserRepository userRepository;
     private final UserProfileMapper userProfileMapper;
+    private final UserProfileDetailMapper userProfileDetailMapper;
 
 
     @Override
@@ -39,7 +44,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
         if (userProfileByUserId.isPresent()) {
             throw new UserProfileAlreadyAddedException(String.format("Profile with user id %s already added",request.getUserId()),"Please go to update feature anyway!");
         }
-        var userId = userRepository.findById(request.getUserId()).orElseThrow(()-> new DataNotFoundException(String.format("User with id %s is not found{}",request.getUserId()), "Please choose another user"));
+        var userId = userRepository.findById(request.getUserId()).orElseThrow(()-> new DataNotFoundException(String.format("User with id %s is not found{}",request.getUserId()),"Please check your data"));
 
         if (Boolean.FALSE.equals(userId.getIsActive())) {
                 throw new EmailNotVerifiedException("Email is not verified!","Please verify you account");
@@ -89,8 +94,8 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
     public CompleteOrUpdateUserProfileResponse updateUserProfile(CompleteOrUpdateUserProfileRequest request) {
         var userProfileByUserId = userProfileRepository.findByUserId(request.getUserId());
-        var userProfileExtended = userProfileExtendedRepository.findByUserProfile(userProfileByUserId).orElseThrow(() -> new DataNotFoundException("User profile is not found", "please check your database"));
-        var domicile = domicileRepository.findByUserProfileExtendedId(userProfileExtended).orElseThrow(() -> new DataNotFoundException("Domicile is not found", "please check your database"));
+        var userProfileExtended = userProfileExtendedRepository.findByUserProfile(userProfileByUserId).orElseThrow(() -> new DataNotFoundException("User profile is not found","Please check your user id"));
+        var domicile = domicileRepository.findByUserProfileExtendedId(userProfileExtended).orElseThrow(() -> new DataNotFoundException("Domicile is not found","please check your data"));
 
         userProfileExtended.setAddress(request.getAddress());
         userProfileExtended.setBirthDate(request.getBirthDate());
@@ -112,5 +117,15 @@ public class UserProfileServiceImpl implements IUserProfileService {
             return userProfileMapper.convert(requestMapper);
         }
         return null;
+    }
+
+    @Override
+    public UserProfilleDetailResponse getDetailUserProfile(Long userId) {
+        var userProfileByUserId = userProfileRepository.findByUserId(userId).orElseThrow(() ->  new DataNotFoundException(String.format("User with id %s not found",userId),"Check your userId"));
+        var userProfileExtended = userProfileExtendedRepository.findByUserProfile(Optional.ofNullable(userProfileByUserId)).orElseThrow(() ->  new DataNotFoundException("Profile extended not found","please check your data"));
+        var domicile = domicileRepository.findByUserProfileExtendedId(userProfileExtended).orElseThrow(() -> new DataNotFoundException("Domicile is not found","Please check your data"));
+        UserProfileDetailMapper.Request requestMapper = new UserProfileDetailMapper.Request(userProfileByUserId,userProfileExtended,domicile);
+        return userProfileDetailMapper.convert(requestMapper);
+
     }
 }

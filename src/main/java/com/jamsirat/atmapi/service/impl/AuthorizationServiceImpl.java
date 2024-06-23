@@ -29,9 +29,9 @@ public class AuthorizationServiceImpl implements IAuthorizationService {
     @Override
     @Transactional
     public GrantRoleAccessResponse giveAccessToUser(Long userId, Long roleId, Principal principal) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User is not found","Please verify your account"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User is not found","Please check your request id"));
         List<String> activeRoles = getRolesByLoggedInUser(principal);
-        Role newRole = roleRepository.findById(roleId).orElseThrow(() -> new DataNotFoundException("Specified role does not exist","please verify your account"));
+        Role newRole = roleRepository.findById(roleId).orElseThrow(() -> new DataNotFoundException("Specified role does not exist","Please check your database"));
         if (user.getIsActive() == Boolean.TRUE && !activeRoles.contains(EUserRole.ADMIN.getName())) {
             throw new UnauthorizedGrantingAccessException("You are not allowed to grant access role","User role is not granted");
         }
