@@ -2,9 +2,9 @@ package com.jamsirat.atmapi.model.auth;
 
 
 import com.jamsirat.atmapi.model.Base.AAuditableBase;
-import com.jamsirat.atmapi.model.Base.BaseMasterData;
-import com.jamsirat.atmapi.model.profile.UserProfile;
+import com.jamsirat.atmapi.statval.enumeration.EGender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,9 +32,6 @@ public class User extends AAuditableBase implements UserDetails, Serializable {
     private static final long serialVersionUID = 1149799443782698228L;
 
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
-    private UserProfile userProfile;
-
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinTable(
             name = "link_user_role",
@@ -47,32 +44,43 @@ public class User extends AAuditableBase implements UserDetails, Serializable {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @NotNull
+    @NotBlank(message = "FirstName is mandatory")
     @Column(name = "first_name")
     private String firstName;
 
+    @NotNull
+    @NotBlank(message = "Last name is mandatory")
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "user_name")
-    private String userName;
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is mandatory")
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "gender")
+    @Enumerated(EnumType.STRING)
+    private EGender gender;
 
     @Column(name = "password")
     private String password;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
-
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
+    @Column(name = "is_active")
+    private Boolean isActive;
 
-    public User(Set<String> roleNames, String firstName, String lastName, String userName, String password, Boolean isActive) {
+
+
+    public User(Set<String> roleNames, String firstName, String lastName, String email, String password, Boolean isActive) {
         this.roles = roleNames.stream()
                 .map(Role::new)
                 .collect(Collectors.toSet());
         this.firstName = firstName;
         this.lastName = lastName;
-        this.userName = userName;
+        this.email = email;
         this.password = password;
         this.isActive = isActive;
     }
@@ -86,7 +94,7 @@ public class User extends AAuditableBase implements UserDetails, Serializable {
 
     @Override
     public String getUsername() {
-        return userName;
+        return email;
     }
 
     @Override

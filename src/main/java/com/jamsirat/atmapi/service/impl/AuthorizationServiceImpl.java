@@ -58,7 +58,7 @@ public class AuthorizationServiceImpl implements IAuthorizationService {
     }
 
     private User getLoggedInUser(Principal principal) {
-        return userRepository.findByUserName(principal.getName()).get();
+        return userRepository.findByEmail(principal.getName()).get();
     }
 
 }

@@ -3,7 +3,7 @@ package com.jamsirat.atmapi.endpoint;
 
 import com.jamsirat.atmapi.dto.request.GrantRoleAccessRequest;
 import com.jamsirat.atmapi.dto.response.GrantRoleAccessResponse;
-import com.jamsirat.atmapi.dto.response.HttpResponse;
+import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.service.IAuthorizationService;
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant;
 import lombok.RequiredArgsConstructor;

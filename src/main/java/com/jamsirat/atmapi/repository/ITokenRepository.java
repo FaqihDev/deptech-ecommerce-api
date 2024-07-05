@@ -1,6 +1,7 @@
 package com.jamsirat.atmapi.repository;
 
 import com.jamsirat.atmapi.model.auth.Token;
+import com.jamsirat.atmapi.model.auth.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,6 +20,7 @@ public interface ITokenRepository extends JpaRepository<Token,Long> {
 
     Optional<Token> findByToken(String token);
 
+    List<Token> findByUser(User user);
 
 
 }

@@ -2,8 +2,7 @@ package com.jamsirat.atmapi.config;
 
 import com.jamsirat.atmapi.repository.ITokenRepository;
 import com.jamsirat.atmapi.service.impl.JwtService;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -19,12 +18,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -60,41 +57,39 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (Objects.nonNull(authHeader)) {
-            jwt = authHeader.substring(7);
-            userEmail = jwtService.extractUsername(jwt);
-            //check for new user
-            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                //get the user from userDetails
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-                var isTokenValid = tokenRepository.findByToken(jwt)
-                        .map(token -> !token.isTokenExpired() && !token.isRevoked())
-                        .orElse(false);
+        jwt = authHeader.substring(7);
+        userEmail = jwtService.extractUsername(jwt);
+        //check for new user
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            //get the user from userDetails
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            var isTokenValid = tokenRepository.findByToken(jwt)
+                    .map(token -> !token.isTokenExpired() && !token.isRevoked())
+                    .orElse(false);
 
-                log.info("is token valid {}", isTokenValid );
-                //recheck if token is valid belongs to user
-                if (jwtService.isTokenValid(jwt,userDetails) && Boolean.TRUE.equals(isTokenValid)) {
-                   String roles = jwtService.extractRoles(jwt);
+            log.info("is token valid {}", isTokenValid );
+            //recheck if token is valid belongs to user
+            if (jwtService.isTokenValid(jwt,userDetails) && Boolean.TRUE.equals(isTokenValid)) {
+                String roles = jwtService.extractRoles(jwt);
 
-                   if (Objects.nonNull(roles)) {
-                       List<SimpleGrantedAuthority> authorities = Arrays.stream(roles.split(","))
-                               .map(SimpleGrantedAuthority::new)
-                               .toList();
+                if (Objects.nonNull(roles)) {
+                    List<SimpleGrantedAuthority> authorities = Arrays.stream(roles.split(","))
+                            .map(SimpleGrantedAuthority::new)
+                            .toList();
 
-                       UsernamePasswordAuthenticationToken authToken =
-                               new UsernamePasswordAuthenticationToken(userDetails,null,authorities);
-                       authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                       SecurityContextHolder.getContext().setAuthentication(authToken);
-                       log.info("authenticated set with roles  {}", userDetails.getAuthorities());
-                   } else {
-                       log.info("no roles found");
-                   }
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails,null,authorities);
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    log.info("authenticated set with roles  {}", userDetails.getAuthorities());
                 } else {
-                    log.info("JWT token is invalid");
+                    log.info("no roles found");
                 }
             } else {
-                log.info("User email is null or security context is already contains authentications");
+                log.info("JWT token is invalid");
             }
+        } else {
+            log.info("User email is null or security context is already contains authentications");
         }
         filterChain.doFilter(httpServletRequest,httpServletResponse);
     }

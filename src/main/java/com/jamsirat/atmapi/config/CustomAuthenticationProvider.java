@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.util;
+package com.jamsirat.atmapi.config;
 
 import com.jamsirat.atmapi.exception.UserNotActivatedException;
 import com.jamsirat.atmapi.service.impl.CustomUserDetailService;

@@ -10,12 +10,12 @@ spring:
       max-file-size: 3MB
       max-request-size: 3MB
   application:
-    name: ATM Web App
+    name: deptech_ecommerce_api
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/atm
-    username: jamsirat
-    password: jamsirat
+    url: jdbc:postgresql://localhost:5432/deptech_ecommerce_api
+    username: faqih
+    password: passwordpostgres
   mail:
     host: smtp.gmail.com
     port: 587

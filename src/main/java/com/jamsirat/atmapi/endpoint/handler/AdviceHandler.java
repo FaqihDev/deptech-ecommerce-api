@@ -1,13 +1,18 @@
 package com.jamsirat.atmapi.endpoint.handler;
 
-import com.jamsirat.atmapi.dto.response.HttpResponse;
+import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.exception.*;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -95,5 +100,30 @@ public class AdviceHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public HttpResponse invalidData(InvalidDataException e) {
         return customExceptionHandler.createHttpResponse(HttpStatus.BAD_REQUEST,e.getExceptionMessage(),e.getDeveloperMessage());
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public HttpResponse constraintValidationException(ConstraintViolationException e) {
+        String detailMessage  = extractValidationMessage(e.getConstraintViolations());
+        return customExceptionHandler.createHttpResponse(HttpStatus.BAD_REQUEST, detailMessage, "Make sure your data is valid / not blank");
+    }
+
+    private String extractValidationMessage(Set<ConstraintViolation<?>> constraintViolations) {
+        return constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining(", "));
+    }
+
+    @ExceptionHandler(TokenIsExpiredException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public HttpResponse handleInvalidToken(TokenIsExpiredException e) {
+        return customExceptionHandler.createHttpResponse(HttpStatus.BAD_REQUEST, e.getExceptionMessage(), e.getDeveloperMessage());
+    }
+
+    @ExceptionHandler(IllegalHeaderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public HttpResponse handleIllegalHeader(IllegalHeaderException e) {
+        return customExceptionHandler.createHttpResponse(HttpStatus.BAD_REQUEST, e.getExceptionMessage(), e.getDeveloperMessage());
     }
 }

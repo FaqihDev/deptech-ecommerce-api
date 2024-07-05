@@ -1,6 +1,6 @@
 package com.jamsirat.atmapi.endpoint.handler;
 
-import com.jamsirat.atmapi.dto.response.HttpResponse;
+import com.jamsirat.atmapi.dto.base.HttpResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 

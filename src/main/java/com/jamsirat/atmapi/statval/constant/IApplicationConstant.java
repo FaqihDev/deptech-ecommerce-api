@@ -33,6 +33,7 @@ public interface IApplicationConstant {
             String LOGIN = "/login";
             String REFRESH_TOKEN = "/refresh-token";
             String VERIFY_ACCOUNT = "/verifyEmail";
+            String USER_DETAIL = "/user-detail";
         }
 
     }

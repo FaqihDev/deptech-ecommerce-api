@@ -1,10 +1,13 @@
 package com.jamsirat.atmapi.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jamsirat.atmapi.dto.response.AuthenticationResponse;
 import com.jamsirat.atmapi.dto.request.LoginRequest;
 import com.jamsirat.atmapi.dto.request.RegistrationRequest;
-import com.jamsirat.atmapi.dto.response.HttpResponse;
+import com.jamsirat.atmapi.dto.base.HttpResponse;
+import com.jamsirat.atmapi.dto.request.RequestUpdateUserDto;
+import com.jamsirat.atmapi.dto.response.ResponseDetailUserDto;
+import com.jamsirat.atmapi.dto.response.ResponseLoginDto;
+import com.jamsirat.atmapi.dto.response.ResponseRegistrationDto;
 import com.jamsirat.atmapi.exception.*;
 import com.jamsirat.atmapi.model.auth.Role;
 import com.jamsirat.atmapi.model.auth.Token;
@@ -21,6 +24,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.IllegalFormatCodePointException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,13 +51,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final EmailValidatorServiceImpl emailValidatorService;
-
-
 
     @Override
     @Transactional
-    public User register(RegistrationRequest request, HttpServletRequest httpServletRequest) {
+    public HttpResponse<Object> register(RegistrationRequest request) {
 
         Set<Role>roles = new HashSet<>();
         EUserRole role = EUserRole.USER;
@@ -66,29 +68,39 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new DataNotFoundException("Role not found","Please check your database");
         }
 
-           var existUser = userRepository.findByUserName(request.getEmail());
-           if (existUser.isPresent()) {
+           var userByEmail = userRepository.findByEmail(request.getEmail());
+           if (userByEmail.isPresent()) {
                throw new UserAlreadyExistException("user is already taken","Please choose another email!");
            }
+               var user = User.builder()
+                       .firstName(request.getFirstName())
+                       .lastName(request.getLastName())
+                       .email(request.getEmail())
+                       .password(passwordEncoder.encode(request.getPassword()))
+                       .roles(roles)
+                       .isActive(true)
+                       .build();
+               roleRepository.saveAll(roles);
+               var currentUser = userRepository.save(user);
+               var jwtToken = jwtService.generateToken(currentUser);
+               saveUserToken(currentUser,jwtToken);
 
-           var validateEmail = emailValidatorService.validateAll(request.getEmail());
-             if(validateEmail) {
-                 var user = User.builder()
-                         .firstName(request.getFirstName())
-                         .lastName(request.getLastName())
-                         .userName(request.getEmail())
-                         .isActive(false)
-                         .password(passwordEncoder.encode(request.getPassword()))
-                         .roles(roles)
-                         .build();
-                 roleRepository.saveAll(roles);
-                 var currentUser = userRepository.save(user);
-                 var jwtToken = jwtService.generateToken(currentUser);
-                 saveUserToken(currentUser,jwtToken);
-                 return currentUser;
-             } else {
-                 throw new EmailNotValidException("Email is not valid","ExampleEmail : xxx@gmail.com");
-             }
+
+        ResponseRegistrationDto response = ResponseRegistrationDto.builder()
+                .name(user.getFirstName() + " " + user.getLastName())
+                .role(EUserRole.USER.getName())
+                .email(user.getEmail())
+                .build();
+
+        return HttpResponse.builder()
+                        .timeStamp(LocalDateTime.now().toString())
+                        .developerMessage("Verify your account ! Verification link was sent to your email")
+                        .message("User created")
+                        .statusCode(HttpStatus.CREATED.value())
+                        .status(HttpStatus.CREATED)
+                        .data(response)
+                        .build();
+
     }
 
 
@@ -118,19 +130,20 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
            throw new UserNotFoundException("User is not found");
        }
 
-       var user = userRepository.findByUserName(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("username not found"));
+       var user = userRepository.findByEmail(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("username not found"));
        var jwtToken = jwtService.generateToken(user);
        var refreshToken = jwtService.refreshToken(user);
 
         String roles = user.getRoles().stream()
                 .map(role -> role.getUserRole().getName())
                 .collect(Collectors.joining(", "));
-        AuthenticationResponse response = AuthenticationResponse.builder()
+
+        ResponseLoginDto response = ResponseLoginDto.builder()
                         .name(user.getFirstName())
+                        .role(roles)
+                        .email(user.getEmail())
                         .accessToken(jwtToken)
                         .refreshToken(refreshToken)
-                        .role(roles)
-                        .isEnabled(user.isEnabled())
                         .build();
 
         revokeAllUserToken(user);
@@ -140,28 +153,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .timeStamp(LocalDateTime.now().toString())
                 .status(HttpStatus.OK)
                 .statusCode(HttpStatus.OK.value())
-                .developerMessage("Login successfull")
+                .developerMessage("Login successfully")
                 .data(response)
                 .build();
-    }
-
-    @Override
-    public AuthenticationResponse verifyEmail(String token) {
-        var verifyToken  = tokenRepository.findByToken(token).orElseThrow(()-> new IllegalArgumentException("Invalid token"));
-        if (verifyToken.getUser().isEnabled()) {
-            throw new EmailAlreadyVerifiedException("Email is already verified!","Please do login");
-        }
-
-
-        if (jwtService.isTokenValid(token, verifyToken.getUser())) {
-         verifyToken.getUser().setIsActive(true);
-         tokenRepository.save(verifyToken);
-         return AuthenticationResponse.builder()
-                    .isEnabled(verifyToken.getUser().isEnabled())
-                    .build();
-        } else {
-            throw new IllegalArgumentException("Invalid Token");
-        }
     }
 
     @Override
@@ -178,9 +172,55 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     @Override
-    public String applicationUrl(HttpServletRequest request) {
-        return "http://" + request.getServerName()+ ":" + request.getServerPort()+request.getContextPath();
+    public HttpResponse<Object> getListUsers() {
+        return null;
     }
+
+    @Override
+    public HttpResponse<Object> updateUsers(RequestUpdateUserDto request) {
+        return null;
+    }
+
+    @Override
+    public HttpResponse<Object> deleteUsers(Long userId) {
+        return null;
+    }
+
+    @Override
+    public HttpResponse<Object> getDetailUsers(HttpServletRequest request) {
+
+        User user = null;
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (Objects.nonNull(authHeader) && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            user = userRepository.findByToken(token);
+
+            String roles = user.getRoles().stream()
+                    .map(role -> role.getUserRole().getName())
+                    .collect(Collectors.joining(", "));
+            ResponseDetailUserDto data = ResponseDetailUserDto.builder()
+                    .userId(user.getId())
+                    .email(user.getEmail())
+                    .name(user.getFirstName() + " " + user.getLastName())
+                    .role(roles)
+                    .build();
+
+            if (Objects.nonNull(user)) {
+                return HttpResponse.builder()
+                        .message("Profile we trust!")
+                        .timeStamp(LocalDateTime.now().toString())
+                        .status(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .developerMessage("Get Detail Successfully")
+                        .data(data)
+                        .build();
+            }
+                throw new DataNotFoundException("User is not found","make sure you have register");
+
+           }
+             throw new IllegalHeaderException("Authorization header and Bearer is not set","Please check your header");
+    }
+
 
     private void revokeAllUserToken(User user) {
         var validTokenUsers = tokenRepository.findAllByValidToken(user.getId());
@@ -193,7 +233,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         });
         tokenRepository.saveAll(validTokenUsers);
     }
-
 
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -210,13 +249,13 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            var user = userRepository.findByUserName(userEmail).orElseThrow(()-> new UsernameNotFoundException("Username not found exception"));
+            var user = userRepository.findByEmail(userEmail).orElseThrow(()-> new UsernameNotFoundException("Username not found exception"));
             //get valid token
             if (jwtService.isTokenValid(refreshToken,user)) {
                 var accessToken  = jwtService.generateToken(user);
                 revokeAllUserToken(user);
                 saveUserToken(user,accessToken);
-                var authResponse = AuthenticationResponse
+                var authResponse = ResponseLoginDto
                         .builder()
                         .build();
                 new ObjectMapper().writeValue(response.getOutputStream(),authResponse);

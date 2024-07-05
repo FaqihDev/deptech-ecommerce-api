@@ -19,5 +19,4 @@ public interface IDATAMapper<SOURCE,TARGET> extends Converter<SOURCE,TARGET> {
 
     Page<TARGET> entitiesPageIntoDTOPage(Page<SOURCE> data);
 
-
 }
