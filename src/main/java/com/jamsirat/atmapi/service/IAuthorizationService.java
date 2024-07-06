@@ -1,6 +1,6 @@
 package com.jamsirat.atmapi.service;
 
-import com.jamsirat.atmapi.dto.response.GrantRoleAccessResponse;
+import com.jamsirat.atmapi.dto.response.user.GrantRoleAccessResponse;
 
 import java.security.Principal;
 import java.util.List;

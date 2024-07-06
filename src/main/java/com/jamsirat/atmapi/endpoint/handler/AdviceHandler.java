@@ -126,4 +126,10 @@ public class AdviceHandler {
     public HttpResponse handleIllegalHeader(IllegalHeaderException e) {
         return customExceptionHandler.createHttpResponse(HttpStatus.BAD_REQUEST, e.getExceptionMessage(), e.getDeveloperMessage());
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public HttpResponse handleAccessDenied(AccessDeniedException e) {
+        return customExceptionHandler.createHttpResponse(HttpStatus.UNAUTHORIZED, e.getExceptionMessage(), e.getDeveloperMessage());
+    }
 }

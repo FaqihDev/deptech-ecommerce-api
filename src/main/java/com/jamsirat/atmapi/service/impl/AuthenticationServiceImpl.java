@@ -1,13 +1,11 @@
 package com.jamsirat.atmapi.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jamsirat.atmapi.dto.request.LoginRequest;
-import com.jamsirat.atmapi.dto.request.RegistrationRequest;
+import com.jamsirat.atmapi.dto.request.user.LoginRequest;
+import com.jamsirat.atmapi.dto.request.user.RegistrationRequest;
 import com.jamsirat.atmapi.dto.base.HttpResponse;
-import com.jamsirat.atmapi.dto.request.RequestUpdateUserDto;
-import com.jamsirat.atmapi.dto.response.ResponseDetailUserDto;
-import com.jamsirat.atmapi.dto.response.ResponseLoginDto;
-import com.jamsirat.atmapi.dto.response.ResponseRegistrationDto;
+import com.jamsirat.atmapi.dto.response.user.ResponseLoginDto;
+import com.jamsirat.atmapi.dto.response.user.ResponseRegistrationDto;
 import com.jamsirat.atmapi.exception.*;
 import com.jamsirat.atmapi.model.auth.Role;
 import com.jamsirat.atmapi.model.auth.Token;
@@ -16,6 +14,7 @@ import com.jamsirat.atmapi.repository.IRoleRepository;
 import com.jamsirat.atmapi.repository.ITokenRepository;
 import com.jamsirat.atmapi.repository.IUserRepository;
 import com.jamsirat.atmapi.service.IAuthenticationService;
+import com.jamsirat.atmapi.statval.enumeration.EGender;
 import com.jamsirat.atmapi.statval.enumeration.ETokenType;
 import com.jamsirat.atmapi.statval.enumeration.EUserRole;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +23,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +33,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.IllegalFormatCodePointException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,14 +54,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public HttpResponse<Object> register(RegistrationRequest request) {
 
         Set<Role>roles = new HashSet<>();
-        EUserRole role = EUserRole.USER;
+        EUserRole role = EUserRole.ROLE_USER;
         try {
             Role userRole = roleRepository.findByUserRole(role);
             if (Objects.nonNull(userRole)) {
                 roles.add(userRole);
             }
         } catch (DataNotFoundException e) {
-            log.error("Error find Role by Code {} : {} %s".formatted(EUserRole.USER), e.toString());
+            log.error("Error find Role by Code {} : {} %s".formatted(EUserRole.ROLE_USER), e.toString());
             throw new DataNotFoundException("Role not found","Please check your database");
         }
 
@@ -79,6 +76,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                        .password(passwordEncoder.encode(request.getPassword()))
                        .roles(roles)
                        .isActive(true)
+                       .gender(EGender.valueOf(request.getGender()))
                        .build();
                roleRepository.saveAll(roles);
                var currentUser = userRepository.save(user);
@@ -88,7 +86,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         ResponseRegistrationDto response = ResponseRegistrationDto.builder()
                 .name(user.getFirstName() + " " + user.getLastName())
-                .role(EUserRole.USER.getName())
+                .role(EUserRole.ROLE_USER.getName())
                 .email(user.getEmail())
                 .build();
 
@@ -171,55 +169,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         return "valid";
     }
 
-    @Override
-    public HttpResponse<Object> getListUsers() {
-        return null;
-    }
-
-    @Override
-    public HttpResponse<Object> updateUsers(RequestUpdateUserDto request) {
-        return null;
-    }
-
-    @Override
-    public HttpResponse<Object> deleteUsers(Long userId) {
-        return null;
-    }
-
-    @Override
-    public HttpResponse<Object> getDetailUsers(HttpServletRequest request) {
-
-        User user = null;
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (Objects.nonNull(authHeader) && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            user = userRepository.findByToken(token);
-
-            String roles = user.getRoles().stream()
-                    .map(role -> role.getUserRole().getName())
-                    .collect(Collectors.joining(", "));
-            ResponseDetailUserDto data = ResponseDetailUserDto.builder()
-                    .userId(user.getId())
-                    .email(user.getEmail())
-                    .name(user.getFirstName() + " " + user.getLastName())
-                    .role(roles)
-                    .build();
-
-            if (Objects.nonNull(user)) {
-                return HttpResponse.builder()
-                        .message("Profile we trust!")
-                        .timeStamp(LocalDateTime.now().toString())
-                        .status(HttpStatus.OK)
-                        .statusCode(HttpStatus.OK.value())
-                        .developerMessage("Get Detail Successfully")
-                        .data(data)
-                        .build();
-            }
-                throw new DataNotFoundException("User is not found","make sure you have register");
-
-           }
-             throw new IllegalHeaderException("Authorization header and Bearer is not set","Please check your header");
-    }
 
 
     private void revokeAllUserToken(User user) {

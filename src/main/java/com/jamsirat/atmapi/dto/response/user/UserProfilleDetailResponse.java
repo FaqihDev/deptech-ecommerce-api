@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.dto.response;
+package com.jamsirat.atmapi.dto.response.user;
 
 
 import lombok.*;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CompleteOrUpdateUserProfileResponse {
+public class UserProfilleDetailResponse {
 
     private Long userId;
     private String fullName;
@@ -25,6 +25,5 @@ public class CompleteOrUpdateUserProfileResponse {
     private String desaSambung;
     private String kelompokAddress;
     private String desaAddress;
-
 
 }

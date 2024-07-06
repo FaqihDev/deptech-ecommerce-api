@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatusCode;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -23,5 +24,18 @@ public  class HttpResponse<T> implements Serializable {
     private HttpStatus status;
     private int statusCode;
     private T data;
+
+
+    public static <T> HttpResponse<T> buildHttpResponse(String developerMessage, String message, HttpStatus status, int statusCode, T data) {
+        return HttpResponse.<T>builder()
+                .timeStamp(LocalDateTime.now().toString())
+                .developerMessage(developerMessage)
+                .message(message)
+                .status(status)
+                .statusCode(statusCode)
+                .data(data)
+                .build();
+    }
+
 
 }

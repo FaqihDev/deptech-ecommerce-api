@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.dto.request;
+package com.jamsirat.atmapi.dto.request.user;
 
 
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ public class RequestUpdateUserDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 7470182582239094570L;
-
+    private Long userId;
     private String firstName;
     private String lastName;
 

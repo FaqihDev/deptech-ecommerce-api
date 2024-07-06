@@ -1,6 +1,6 @@
 package com.jamsirat.atmapi.service.impl;
 
-import com.jamsirat.atmapi.dto.response.GrantRoleAccessResponse;
+import com.jamsirat.atmapi.dto.response.user.GrantRoleAccessResponse;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
 import com.jamsirat.atmapi.exception.RoleHasBeenAddedException;
 import com.jamsirat.atmapi.exception.UnauthorizedGrantingAccessException;
@@ -32,7 +32,7 @@ public class AuthorizationServiceImpl implements IAuthorizationService {
         User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User is not found","Please check your request id"));
         List<String> activeRoles = getRolesByLoggedInUser(principal);
         Role newRole = roleRepository.findById(roleId).orElseThrow(() -> new DataNotFoundException("Specified role does not exist","Please check your database"));
-        if (user.getIsActive() == Boolean.TRUE && !activeRoles.contains(EUserRole.ADMIN.getName())) {
+        if (user.getIsActive() == Boolean.TRUE && !activeRoles.contains(EUserRole.ROLE_ADMIN.getName())) {
             throw new UnauthorizedGrantingAccessException("You are not allowed to grant access role","User role is not granted");
         }
         if (user.getRoles().stream().anyMatch(role -> role.getId().equals(roleId))) {

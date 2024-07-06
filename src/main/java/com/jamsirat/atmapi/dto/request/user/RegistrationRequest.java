@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.dto.request;
+package com.jamsirat.atmapi.dto.request.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,4 +21,5 @@ public class RegistrationRequest implements Serializable {
     private String lastName;
     private String email;
     private String password;
+    private String gender;
 }

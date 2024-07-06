@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.dto.response;
+package com.jamsirat.atmapi.dto.response.user;
 
 
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ResponseUpdateUserDto {
-    private String userId;
+    private String id;
     private String firstName;
     private String lastName;
     private String email;

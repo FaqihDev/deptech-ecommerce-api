@@ -1,7 +1,7 @@
 package com.jamsirat.atmapi.endpoint;
 
-import com.jamsirat.atmapi.dto.request.LoginRequest;
-import com.jamsirat.atmapi.dto.request.RegistrationRequest;
+import com.jamsirat.atmapi.dto.request.user.LoginRequest;
+import com.jamsirat.atmapi.dto.request.user.RegistrationRequest;
 import com.jamsirat.atmapi.service.impl.JwtService;
 import com.jamsirat.atmapi.service.impl.AuthenticationServiceImpl;
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant;
@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,10 +42,4 @@ public class RegistrationEndpoint {
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         authenticationService.refreshToken(request,response);
     }
-
-    @GetMapping(IApplicationConstant.Path.Authentication.USER_DETAIL)
-    public ResponseEntity<?> detailUser(HttpServletRequest request) {
-       return ResponseEntity.ok(authenticationService.getDetailUsers(request));
-    }
-
 }

@@ -4,10 +4,12 @@ public interface IApplicationConstant {
 
     interface ContextPath{
         String ORDER = "/v1/order-service";
-        String USER = "/v1/user-service";
+        String USER = "/api/v1/user";
         String AUTHENTICATION = "/api/v1/auth";
         String AUTHORIZATION = "/api/v1/grant";
-        String USER_PROFILE = "/api/v1/user";
+        String PRODUCT = "/api/v1/product";
+        String CATEGORY_PRODUCT = "/api/v1/category";
+
     }
 
     interface Path{
@@ -18,10 +20,25 @@ public interface IApplicationConstant {
         }
 
         interface User {
-            String COMPLETE_PROFILE ="/complete-profile";
-            String UPDATE_PROFILE ="/update-profile";
-            String GET_DETAIL_PROFILE = "/detail-profile/{userId}";
+            String USER_DETAIL = "/user-detail";
+            String UPDATE_USER ="/update-user";
+            String DELETE_USER = "/delete-user/{userId}";
+            String LIST_USERS = "/fetch-users";
+        }
 
+        interface Product {
+            String CREATE_PRODUCT = "/create-product";
+            String PRODUCT_DETAIL = "/product-detail";
+            String UPDATE_PRODUCT ="/update-product/";
+            String DELETE_PRODUCT = "/delete-product{productId}";
+            String LIST_PRODUCT = "/fetch-product";
+        }
+
+        interface CategoryProduct {
+            String CATEGORY_PRODUCT_DETAIL = "/create-category";
+            String UPDATE_CATEGORY_PRODUCT ="/update-category";
+            String DELETE_CATEGORY_PRODUCT = "/delete-category/{categoryId}";
+            String LIST_CATEGORY_PRODUCT = "/fetch-category";
         }
 
         interface Authorization {
@@ -33,13 +50,21 @@ public interface IApplicationConstant {
             String LOGIN = "/login";
             String REFRESH_TOKEN = "/refresh-token";
             String VERIFY_ACCOUNT = "/verifyEmail";
-            String USER_DETAIL = "/user-detail";
         }
+
 
     }
 
     interface  DefaultNumber {
         Long OUT_OF_STOCK = 0L;
+
+    }
+
+    interface StaticDefaultMessage {
+
+        interface User {
+
+        }
 
     }
 

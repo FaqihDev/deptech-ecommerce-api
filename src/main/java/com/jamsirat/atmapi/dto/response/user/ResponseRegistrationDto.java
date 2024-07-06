@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.dto.response;
+package com.jamsirat.atmapi.dto.response.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

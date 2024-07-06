@@ -24,5 +24,5 @@ public abstract class BaseMasterData<KEY extends  Serializable> implements Seria
     protected KEY id;
 
     @Column(name = "is_deleted")
-    protected Boolean isDeleted;
+    protected Boolean isDeleted = false;
 }

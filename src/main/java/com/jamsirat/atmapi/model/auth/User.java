@@ -6,6 +6,7 @@ import com.jamsirat.atmapi.statval.enumeration.EGender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 @Setter
 @Getter
 @Table(name = "users")
+@Where(clause = "is_deleted = false")
 public class User extends AAuditableBase implements UserDetails, Serializable {
 
     @Serial
@@ -72,6 +75,8 @@ public class User extends AAuditableBase implements UserDetails, Serializable {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
 
 
     public User(Set<String> roleNames, String firstName, String lastName, String email, String password, Boolean isActive) {

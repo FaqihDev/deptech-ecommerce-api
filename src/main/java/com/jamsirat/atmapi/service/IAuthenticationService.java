@@ -1,13 +1,9 @@
 package com.jamsirat.atmapi.service;
 
-import com.jamsirat.atmapi.dto.request.LoginRequest;
-import com.jamsirat.atmapi.dto.request.RegistrationRequest;
+import com.jamsirat.atmapi.dto.request.user.LoginRequest;
+import com.jamsirat.atmapi.dto.request.user.RegistrationRequest;
 import com.jamsirat.atmapi.dto.base.HttpResponse;
-import com.jamsirat.atmapi.dto.request.RequestUpdateUserDto;
 import com.jamsirat.atmapi.model.auth.User;
-import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.List;
 
 public interface IAuthenticationService {
 
@@ -19,12 +15,6 @@ public interface IAuthenticationService {
 
      String validateToken(String token);
 
-     HttpResponse<Object> getListUsers();
 
-     HttpResponse<Object> updateUsers(RequestUpdateUserDto request);
-
-     HttpResponse<Object> deleteUsers(Long userId);
-
-     HttpResponse<Object> getDetailUsers(HttpServletRequest request);
 
 }

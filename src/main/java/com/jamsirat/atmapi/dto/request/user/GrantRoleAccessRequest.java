@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.dto.request;
+package com.jamsirat.atmapi.dto.request.user;
 
 import lombok.*;
 
