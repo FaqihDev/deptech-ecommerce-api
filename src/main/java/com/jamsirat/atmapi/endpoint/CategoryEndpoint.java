@@ -39,8 +39,8 @@ public class CategoryEndpoint {
     }
 
     @DeleteMapping(IApplicationConstant.Path.CategoryProduct.DELETE_CATEGORY_PRODUCT)
-    public ResponseEntity<?> deleteCategory(@PathVariable Long ProductId) {
-        return ResponseEntity.ok(categoryProductService.deleteCategoryProduct(ProductId));
+    public ResponseEntity<?> deleteCategory(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(categoryProductService.deleteCategoryProduct(categoryId));
     }
 
 }

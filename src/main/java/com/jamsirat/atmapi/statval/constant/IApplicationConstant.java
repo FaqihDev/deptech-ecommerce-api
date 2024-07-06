@@ -30,13 +30,13 @@ public interface IApplicationConstant {
             String ADD_PRODUCT = "/add-product";
             String PRODUCT_DETAIL = "/product-detail/{productId}";
             String UPDATE_PRODUCT ="/update-product";
-            String DELETE_PRODUCT = "/delete-product{productId}";
+            String DELETE_PRODUCT = "/delete-product/{productId}";
             String LIST_PRODUCT = "/fetch-product";
         }
 
         interface CategoryProduct {
             String ADD_CATEGORY = "/add-category";
-            String CATEGORY_PRODUCT_DETAIL = "/detail-category{categoryId}";
+            String CATEGORY_PRODUCT_DETAIL = "/detail-category/{categoryId}";
             String UPDATE_CATEGORY_PRODUCT ="/update-category";
             String DELETE_CATEGORY_PRODUCT = "/delete-category/{categoryId}";
             String LIST_CATEGORY_PRODUCT = "/fetch-category";

@@ -80,8 +80,8 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
     }
 
     @Override
-    public HttpResponse<Object> deleteCategoryProduct(Long CategoryProductId) {
-        var CategoryProduct = categoryRepository.findById(CategoryProductId).orElseThrow(() -> new DataNotFoundException(String.format("CategoryProduct with id %d is not exist", CategoryProductId),"please check again your CategoryProduct id"));
+    public HttpResponse<Object> deleteCategoryProduct(Long categoryId) {
+        var CategoryProduct = categoryRepository.findById(categoryId).orElseThrow(() -> new DataNotFoundException(String.format("CategoryProduct with id %d is not exist", categoryId),"please check again your CategoryProduct id"));
         CategoryProduct.setIsDeleted(true);
         categoryRepository.save(CategoryProduct);
         return HttpResponse.buildHttpResponse("CategoryProduct has been deleted",
