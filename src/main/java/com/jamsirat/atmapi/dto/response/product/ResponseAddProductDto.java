@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseCreateProductDto implements Serializable {
+public class ResponseAddProductDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;

@@ -2,8 +2,9 @@ package com.jamsirat.atmapi.service.impl;
 
 
 import com.jamsirat.atmapi.dto.base.HttpResponse;
-import com.jamsirat.atmapi.dto.request.product.RequestDetailProductDto;
+import com.jamsirat.atmapi.dto.request.product.RequestAddProductDto;
 import com.jamsirat.atmapi.dto.request.product.RequestUpdateProductDto;
+import com.jamsirat.atmapi.dto.response.category.ResponseAddCategoryProductDto;
 import com.jamsirat.atmapi.dto.response.product.ResponseDetailProductDto;
 import com.jamsirat.atmapi.dto.response.product.ResponseUpdateProductDto;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
@@ -31,26 +32,44 @@ public class ProductServiceImpl implements IProductService {
     private final ICategoryRepository categoryRepository;
 
     @Override
+    public HttpResponse<Object> addProduct(RequestAddProductDto request) {
+
+        var categoryProduct = categoryRepository.findById(request.getProductCategoryId()).orElseThrow(() ->
+                new DataNotFoundException(String.format("Category with id %s is not exist",request.getProductCategoryId()),
+                                                        "Please make sure category is correct"));
+            var product = Product.builder()
+                        .stockProduct(request.getStockProduct())
+                        .productName(request.getProductName())
+                        .image(request.getImage())
+                        .descriptionProduct(request.getDescriptionProduct())
+                        .productCategory(categoryProduct)
+                        .build();
+        productRepository.save(product);
+        ResponseAddCategoryProductDto data = MapperUtil.parse(product,ResponseAddCategoryProductDto.class,MatchingStrategies.STRICT);
+        return HttpResponse.buildHttpResponse("Data Added Successfully",
+                "Data Saved",
+                HttpStatus.CREATED,
+                HttpStatus.CREATED.value(),
+                data);
+    }
+
+    @Override
     public HttpResponse<Object> getListProduct() {
         List<Product> product = productRepository.findAll();
-        List<ResponseDetailProductDto> listproduct =   product.stream()
-                .map(product1 -> {
-                    ResponseDetailProductDto dto = MapperUtil.parse(product1, ResponseDetailProductDto.class,MatchingStrategies.STRICT);
-                    return dto;
-                }).collect(Collectors.toList());
-
+        List<ResponseDetailProductDto> listProduct =   product.stream()
+                .map(productMap -> MapperUtil.parse(productMap, ResponseDetailProductDto.class,MatchingStrategies.STRICT)).collect(Collectors.toList());
         return  HttpResponse.buildHttpResponse("Data fetched Successfully",
                 "Data Fetched",
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
-                listproduct);
+                listProduct);
 
     }
 
     @Override
     public HttpResponse<Object> updateProduct(RequestUpdateProductDto request) {
         var product = productRepository.findById(request.getId()).orElseThrow(() ->  new DataNotFoundException(String.format("Product with id %d is not exist", request.getId()),"please check again your Product id"));
-        var categoryProduct = categoryRepository.findByProduct(request.getProductCategoryId()).orElseThrow(() -> new DataNotFoundException(String.format("category  with product id %d is not exist", product.getId()),"please check again your Product id"));
+        var categoryProduct = categoryRepository.findByProducts(product).orElseThrow(() -> new DataNotFoundException(String.format("category  with product id %d is not exist", product.getId()),"please check again your Product id"));
         product.setProductName(request.getProductName());
         product.setDescriptionProduct(request.getDescriptionProduct());
         product.setStockProduct(request.getStockProduct());
@@ -79,8 +98,8 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public HttpResponse<Object> getDetailProduct(RequestDetailProductDto request) {
-            Product product = productRepository.findById(request.getId()).orElseThrow(() -> new DataNotFoundException(String.format("Product with id %d is not exist", request.getId()),"please check again your Product id"));
+    public HttpResponse<Object> getDetailProduct(Long productId) {
+            Product product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException(String.format("Product with id %d is not exist", productId),"please check again your Product id"));
             ResponseDetailProductDto data = MapperUtil.parse(product,ResponseDetailProductDto.class,MatchingStrategies.STRICT);
             return HttpResponse.buildHttpResponse("Detail product fetched success",
                     "Data fetched",

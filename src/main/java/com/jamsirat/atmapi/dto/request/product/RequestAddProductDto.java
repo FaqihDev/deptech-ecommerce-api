@@ -15,10 +15,9 @@ public class RequestAddProductDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 697096363431663222L;
-
     private String productName;
     private String image;
-    private Long stockProduct;
+    private Integer stockProduct;
     private String descriptionProduct;
     private Long productCategoryId;
 }

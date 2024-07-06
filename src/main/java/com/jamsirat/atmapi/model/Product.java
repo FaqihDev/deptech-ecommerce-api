@@ -2,10 +2,7 @@ package com.jamsirat.atmapi.model;
 
 import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 @Entity
@@ -15,6 +12,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @Setter
 @Getter
+@Builder
 public class Product extends AAuditableBase {
 
 

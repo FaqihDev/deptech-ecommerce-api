@@ -2,15 +2,15 @@ package com.jamsirat.atmapi.model;
 
 import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Where;
+
+import java.util.List;
 
 @Entity
 @Setter
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Where(clause = "is_deleted = false")
@@ -25,7 +25,7 @@ public class CategoryProduct extends AAuditableBase {
     private String descriptionCategory;
 
     @OneToMany(mappedBy = "productCategory")
-    private Product product;
+    private List<Product> products;
 
 
 }

@@ -9,9 +9,9 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestCreateCategoryProductDto implements Serializable {
+public class RequestAddCategoryProductDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String categoryName;
-    private String categoryProduct;
+    private String descriptionCategory;
 }

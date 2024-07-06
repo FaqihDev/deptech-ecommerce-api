@@ -12,7 +12,7 @@ public class ResponseUpdateCategoryProductDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
-    private String descriptionProduct;
-    private String productCategoryName;
+    private String categoryName;
+    private String descriptionCategory;
 }
 

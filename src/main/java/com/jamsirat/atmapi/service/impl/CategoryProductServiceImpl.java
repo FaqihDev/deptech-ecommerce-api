@@ -1,7 +1,9 @@
 package com.jamsirat.atmapi.service.impl;
 
 import com.jamsirat.atmapi.dto.base.HttpResponse;
+import com.jamsirat.atmapi.dto.request.category.RequestAddCategoryProductDto;
 import com.jamsirat.atmapi.dto.request.category.RequestUpdateCategoryProductDto;
+import com.jamsirat.atmapi.dto.response.category.ResponseAddCategoryProductDto;
 import com.jamsirat.atmapi.dto.response.category.ResponseDetailCategoryProductDto;
 import com.jamsirat.atmapi.dto.response.category.ResponseUpdateCategoryProductDto;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
@@ -24,8 +26,27 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CategoryProductServiceImpl implements ICategoryProductService {
 
-    
     private final ICategoryRepository categoryRepository;
+
+
+    @Override
+    public HttpResponse<Object> addCategoryProduct(RequestAddCategoryProductDto request) {
+
+        CategoryProduct categoryProduct =
+                CategoryProduct.builder()
+                        .categoryName(request.getCategoryName())
+                        .descriptionCategory(request.getDescriptionCategory())
+                        .build();
+
+        categoryRepository.save(categoryProduct);
+        ResponseAddCategoryProductDto data = MapperUtil.parse(categoryProduct,ResponseAddCategoryProductDto.class,MatchingStrategies.STRICT);
+        return HttpResponse.buildHttpResponse("Data Added Successfully",
+                "Data Saved",
+                HttpStatus.CREATED,
+                HttpStatus.CREATED.value(),
+                data);
+
+    }
 
     @Override
     public HttpResponse<Object> getListCategoryProduct() {
@@ -47,8 +68,8 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
     @Override
     public HttpResponse<Object> updateCategoryProduct(RequestUpdateCategoryProductDto request) {
         var categoryProduct = categoryRepository.findById(request.getId()).orElseThrow(() ->  new DataNotFoundException(String.format("CategoryProduct with id %d is not exist", request.getId()),"please check again your CategoryProduct id"));
-        categoryProduct.setCategoryName(request.getCategoryProduct());
-        categoryProduct.setDescriptionCategory(request.getDescriptionProduct());
+        categoryProduct.setCategoryName(request.getCategoryName());
+        categoryProduct.setDescriptionCategory(request.getDescriptionCategory());
         ResponseUpdateCategoryProductDto responseData =  MapperUtil.parse(categoryProduct, ResponseUpdateCategoryProductDto.class, MatchingStrategies.STRICT);
         return HttpResponse.buildHttpResponse("CategoryProduct has been updated",
                 "Data saved",
