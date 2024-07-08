@@ -61,7 +61,7 @@ public class TransactionServiceImpl implements ITransactionHistoryService {
                 map(TransactionRequestProductDto::getProductId).toList();
         var products = productRepository.findAllById(productIds);
         if (products.isEmpty()) {
-            throw new DataNotFoundException("Products does not exist","Please check product id");
+            throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND_EXCEPTION,DeveloperExceptionMessage.DATA_NOT_FOUND_EXCEPTION);
         }
 
         var userX = generateToken(httpServletRequest);
@@ -119,7 +119,7 @@ public class TransactionServiceImpl implements ITransactionHistoryService {
                 .orElse(null);
 
         if (Objects.isNull(requestProduct)) {
-            throw new DataNotFoundException("Product is not found in request","Please check your request");
+            throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND_EXCEPTION,DeveloperExceptionMessage.DATA_NOT_FOUND_EXCEPTION);
         }
 
         if (request.getType().equals(ETransactionType.STOCK_OUT) && product.getStockProduct() < requestProduct.getQuantity()) {
@@ -137,7 +137,7 @@ public class TransactionServiceImpl implements ITransactionHistoryService {
                         .orElse(null);
 
                 if (Objects.isNull(requestProduct)) {
-                    throw new DataNotFoundException("Product is not found in request","Please make sure your request");
+                    throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND_EXCEPTION,DeveloperExceptionMessage.DATA_NOT_FOUND_EXCEPTION);
                 }
 
                 if (request.getType().equals(ETransactionType.STOCK_OUT)) {

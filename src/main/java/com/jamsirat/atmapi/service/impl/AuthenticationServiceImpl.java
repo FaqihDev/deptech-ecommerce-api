@@ -31,8 +31,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.SuccessMessage;
-
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.ExceptionMessage;
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperSuccessMessage;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperExceptionMessage;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -67,12 +68,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             }
         } catch (DataNotFoundException e) {
             log.error("Error find Role by Code {} : {} %s".formatted(EUserRole.ROLE_USER), e.toString());
-            throw new DataNotFoundException("Role not found","Please check your database");
+            throw new DataNotFoundException(ExceptionMessage.ROLE_NOT_FOUND,DeveloperExceptionMessage.ROLE_NOT_FOUND);
         }
 
            var userByEmail = userRepository.findByEmail(request.getEmail());
            if (userByEmail.isPresent()) {
-               throw new UserAlreadyExistException("user is already taken","Please choose another email!");
+               throw new UserAlreadyExistException(ExceptionMessage.EMAIL_ALREADY_TAKEN,DeveloperExceptionMessage.EMAIL_ALREADY_TAKEN);
            }
                var user = User.builder()
                        .firstName(request.getFirstName())
@@ -97,8 +98,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         return HttpResponse.builder()
                         .timeStamp(LocalDateTime.now().toString())
-                        .developerMessage("Verify your account ! Verification link was sent to your email")
-                        .message("User created")
+                        .developerMessage(SuccessMessage.VERIFY_ACCOUNT)
+                        .message(DeveloperSuccessMessage.VERIFY_ACCOUNT)
                         .statusCode(HttpStatus.CREATED.value())
                         .status(HttpStatus.CREATED)
                         .data(response)
@@ -124,14 +125,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
           authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword()));
        } catch (UserNotActivatedException e) {
            log.info("Authentication failed : {} ", e.getMessage());
-           throw new UserNotActivatedException("User is not activated yet", "Please verify your account");
+           throw new UserNotActivatedException(ExceptionMessage.USER_NOT_ACTIVATED_EXCEPTION, DeveloperExceptionMessage.USER_NOT_ACTIVATED_EXCEPTION);
        } catch (org.springframework.security.authentication.BadCredentialsException e) {
-           throw new BadCredentialsException("Invalid username or password");
+           throw new BadCredentialsException(ExceptionMessage.BAD_CREDENTIALS);
        } catch (UserNotFoundException e) {
-           throw new UserNotFoundException("User is not found");
+           throw new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION);
        }
 
-       var user = userRepository.findByEmail(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("username not found"));
+       var user = userRepository.findByEmail(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION));
        var jwtToken = jwtService.generateToken(user);
        var refreshToken = jwtService.refreshToken(user);
 
@@ -150,21 +151,21 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         revokeAllUserToken(user);
         saveUserToken(user,jwtToken);
         return HttpResponse.builder()
-                .message("Profile we trust !")
+                .message(SuccessMessage.LOGIN_SUCCESSFUL)
                 .timeStamp(LocalDateTime.now().toString())
                 .status(HttpStatus.OK)
                 .statusCode(HttpStatus.OK.value())
-                .developerMessage("Login successfully")
+                .developerMessage(DeveloperSuccessMessage.LOGIN_SUCCESSFUL)
                 .data(response)
                 .build();
     }
 
     @Override
     public String validateToken(String token) {
-        var tokenVerifiy = tokenRepository.findByToken(token).orElseThrow(() -> new InvalidTokenException("Token is invalid","Please do login"));
-        var user = tokenVerifiy.getUser();
-        if (!jwtService.isTokenValid(tokenVerifiy.token, user)) {
-            throw new InvalidTokenException("Token is invalid","Please do login");
+        var tokenVerified = tokenRepository.findByToken(token).orElseThrow(() -> new InvalidTokenException(ExceptionMessage.TOKEN_IS_INVALID,DeveloperExceptionMessage.TOKEN_IS_INVALID));
+        var user = tokenVerified.getUser();
+        if (!jwtService.isTokenValid(tokenVerified.token, user)) {
+            throw new InvalidTokenException(ExceptionMessage.TOKEN_IS_INVALID,DeveloperExceptionMessage.TOKEN_IS_INVALID);
         }
 
         user.setIsActive(true);
@@ -207,7 +208,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            var user = userRepository.findByEmail(userEmail).orElseThrow(()-> new UsernameNotFoundException("Username not found exception"));
+            var user = userRepository.findByEmail(userEmail).orElseThrow(()-> new UsernameNotFoundException(ExceptionMessage.USERNAME_NOT_FOUND));
             //get valid token
             if (jwtService.isTokenValid(refreshToken,user)) {
                 var accessToken  = jwtService.generateToken(user);

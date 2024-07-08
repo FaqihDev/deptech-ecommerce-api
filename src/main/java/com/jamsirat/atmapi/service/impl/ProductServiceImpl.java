@@ -20,6 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.SuccessMessage;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperSuccessMessage;
+
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,8 +53,8 @@ public class ProductServiceImpl implements IProductService {
         productRepository.save(product);
         ResponseAddProductDto data = MapperUtil.parse(product,ResponseAddProductDto.class,MatchingStrategies.STRICT);
         data.setProductCategoryName(categoryProduct.getCategoryName());
-        return HttpResponse.buildHttpResponse("Data Added Successfully",
-                "Data Saved",
+        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_ADDED_SUCCESSFULLY,
+                SuccessMessage.DATA_ADDED_SUCCESSFULLY,
                 HttpStatus.CREATED,
                 HttpStatus.CREATED.value(),
                 data);
@@ -74,8 +78,8 @@ public class ProductServiceImpl implements IProductService {
                         .build())
                 .collect(Collectors.toList());
 
-        return HttpResponse.buildHttpResponse("Data fetched successfully",
-                "Data fetched",
+        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
+                SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
                 listProduct);
@@ -94,8 +98,8 @@ public class ProductServiceImpl implements IProductService {
         productRepository.save(product);
         ResponseUpdateProductDto responseData =  MapperUtil.parse(product, ResponseUpdateProductDto.class, MatchingStrategies.STRICT);
         responseData.setCategoryName(categoryProduct.getCategoryName());
-        return HttpResponse.buildHttpResponse("Product has been updated",
-                "Data saved",
+        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_UPDATED_SUCCESSFULLY,
+                SuccessMessage.DATA_UPDATED_SUCCESSFULLY,
                  HttpStatus.OK,
                  HttpStatus.OK.value(),
                  responseData);
@@ -107,8 +111,8 @@ public class ProductServiceImpl implements IProductService {
         var product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException(String.format("Product with id %d is not exist", productId),"please check again your Product id"));
         product.setIsDeleted(true);
         productRepository.save(product);
-        return HttpResponse.buildHttpResponse("Product has been deleted",
-                "Data deleted",
+        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
+                SuccessMessage.DATA_DELETED_SUCCESSFULLY,
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
                 null);
@@ -125,8 +129,8 @@ public class ProductServiceImpl implements IProductService {
         data.setCategoryName(Objects.isNull(productOptional.getProductCategory())
                 ? null
                 : productOptional.getProductCategory().getCategoryName());
-        return HttpResponse.buildHttpResponse("Detail product fetched success",
-                "Data fetched",
+        return HttpResponse.buildHttpResponse(SuccessMessage.DATA_FETCH_SUCCESSFULLY,
+                SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
                 data);

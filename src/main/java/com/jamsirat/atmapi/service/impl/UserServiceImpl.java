@@ -23,6 +23,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.ExceptionMessage;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperExceptionMessage;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.SuccessMessage;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperSuccessMessage;
+
 
 
 import java.util.List;
@@ -50,8 +55,8 @@ public class UserServiceImpl implements IUserService {
                 })
                 .collect(Collectors.toList());
 
-        return HttpResponse.buildHttpResponse("Data fetched Successfully",
-                "Data Fetched",
+        return HttpResponse.buildHttpResponse(SuccessMessage.DATA_FETCH_SUCCESSFULLY,
+                DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
                 listUsers);
@@ -66,8 +71,8 @@ public class UserServiceImpl implements IUserService {
         userRepository.save(user);
 
         ResponseUpdateUserDto responseData =  MapperUtil.parse(user, ResponseUpdateUserDto.class, MatchingStrategies.STRICT);
-        return HttpResponse.buildHttpResponse("Data has been updated",
-                "Data saved",
+        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_UPDATED_SUCCESSFULLY,
+                SuccessMessage.DATA_UPDATED_SUCCESSFULLY,
                  HttpStatus.OK,
                  HttpStatus.OK.value(),
                  responseData);
@@ -79,8 +84,8 @@ public class UserServiceImpl implements IUserService {
         var userById = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException(String.format("user with id %d is not exist", userId),"please check again your user id"));
         userById.setIsDeleted(true);
         userRepository.save(userById);
-        return HttpResponse.buildHttpResponse("Data has been deleted",
-                "Data deleted",
+        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
+                SuccessMessage.DATA_DELETED_SUCCESSFULLY,
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
                 null);
@@ -97,7 +102,7 @@ public class UserServiceImpl implements IUserService {
                 try {
                     user = userRepository.findByToken(token);
                 } catch (Exception e) {
-                    throw new HandlerJwtExpiredTokenException("JWT Token has expired or invalid");
+                    throw new HandlerJwtExpiredTokenException(ExceptionMessage.TOKEN_IS_INVALID);
                 }
 
                 String roles = user.getRoles().stream()
@@ -106,8 +111,8 @@ public class UserServiceImpl implements IUserService {
                 ResponseDetailUserDto data = MapperUtil.parse(user,ResponseDetailUserDto.class,MatchingStrategies.STRICT);
                 data.setRole(roles);
 
-                return HttpResponse.buildHttpResponse("Detail users fetched success",
-                        "Data fetched",
+                return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
+                        SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                         HttpStatus.OK,
                         HttpStatus.OK.value(),
                         data);
@@ -118,7 +123,7 @@ public class UserServiceImpl implements IUserService {
                     HttpResponse.UnAuthorized()
             ).getBody();
         }
-        throw new IllegalHeaderException("Authorization header and Bearer is not set","Please check your header");
+        throw new IllegalHeaderException(ExceptionMessage.AUTHORIZATION_HEADER_INVALID,DeveloperExceptionMessage.AUTHORIZATION_HEADER_INVALID);
     }
 
 }

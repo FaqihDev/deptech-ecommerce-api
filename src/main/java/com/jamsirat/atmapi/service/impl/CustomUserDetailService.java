@@ -11,6 +11,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.ExceptionMessage;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperExceptionMessage;
+
+
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CustomUserDetailService implements UserDetailsService {
@@ -19,11 +23,11 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = userRepository.findByEmail(username).orElseThrow(()-> new UsernameNotFoundException("username is not found"));
+        var user = userRepository.findByEmail(username).orElseThrow(()-> new UsernameNotFoundException(ExceptionMessage.USERNAME_NOT_FOUND));
 
         if (!user.getIsActive()) {
             try {
-                throw new UserNotActivatedException("User is not activated yet","Please verify your account!");
+                throw new UserNotActivatedException(ExceptionMessage.USER_NOT_ACTIVATED_EXCEPTION,DeveloperExceptionMessage.USER_NOT_ACTIVATED_EXCEPTION);
             } catch (UserNotActivatedException e) {
                 throw new RuntimeException(e);
             }

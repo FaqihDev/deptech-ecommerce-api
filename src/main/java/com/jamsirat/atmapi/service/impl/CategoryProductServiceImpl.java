@@ -18,6 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.SuccessMessage;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.ExceptionMessage;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperSuccessMessage;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperExceptionMessage;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,8 +44,8 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
 
         categoryRepository.save(categoryProduct);
         ResponseAddCategoryProductDto data = MapperUtil.parse(categoryProduct,ResponseAddCategoryProductDto.class,MatchingStrategies.STRICT);
-        return HttpResponse.buildHttpResponse("Data Added Successfully",
-                "Data Saved",
+        return HttpResponse.buildHttpResponse(SuccessMessage.DATA_ADDED_SUCCESSFULLY,
+                DeveloperSuccessMessage.DATA_ADDED_SUCCESSFULLY,
                 HttpStatus.CREATED,
                 HttpStatus.CREATED.value(),
                 data);
@@ -56,8 +61,8 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
         List<ResponseDetailCategoryProductDto> data = categories.stream()
                 .map(category -> MapperUtil.parse(category, ResponseDetailCategoryProductDto.class, MatchingStrategies.STRICT))
                 .collect(Collectors.toList());
-        return HttpResponse.buildHttpResponse("Categories fetched successfully",
-                "Data fetched",
+        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
+                SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
                 data);
@@ -69,8 +74,8 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
         categoryProduct.setCategoryName(request.getCategoryName());
         categoryProduct.setDescriptionCategory(request.getDescriptionCategory());
         ResponseUpdateCategoryProductDto responseData =  MapperUtil.parse(categoryProduct, ResponseUpdateCategoryProductDto.class, MatchingStrategies.STRICT);
-        return HttpResponse.buildHttpResponse("CategoryProduct has been updated",
-                "Data saved",
+        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_UPDATED_SUCCESSFULLY,
+                SuccessMessage.DATA_UPDATED_SUCCESSFULLY,
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
                 responseData);
@@ -82,8 +87,8 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
         var CategoryProduct = categoryRepository.findById(categoryId).orElseThrow(() -> new DataNotFoundException(String.format("CategoryProduct with id %d is not exist", categoryId),"please check again your CategoryProduct id"));
         CategoryProduct.setIsDeleted(true);
         categoryRepository.save(CategoryProduct);
-        return HttpResponse.buildHttpResponse("CategoryProduct has been deleted",
-                "Data deleted",
+        return HttpResponse.buildHttpResponse(SuccessMessage.DATA_DELETED_SUCCESSFULLY,
+                DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
                 null);
@@ -95,8 +100,8 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
         if (categoryProductOptional.isPresent()) {
             CategoryProduct categoryProduct = categoryProductOptional.get();
             ResponseDetailCategoryProductDto data = MapperUtil.parse(categoryProduct, ResponseDetailCategoryProductDto.class, MatchingStrategies.STRICT);
-            return HttpResponse.buildHttpResponse("Detail CategoryProduct fetched successfully",
-                    "Data fetched",
+            return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
+                    SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                     HttpStatus.OK,
                     HttpStatus.OK.value(),
                     data);
