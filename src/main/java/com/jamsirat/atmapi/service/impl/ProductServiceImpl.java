@@ -1,6 +1,9 @@
 package com.jamsirat.atmapi.service.impl;
 
 
+import com.jamsirat.atmapi.Mapper.product.ResponseAddProductMapper;
+import com.jamsirat.atmapi.Mapper.product.ResponseDetailProductMapper;
+import com.jamsirat.atmapi.Mapper.product.ResponseUpdateProductMapper;
 import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.dto.request.product.RequestAddProductDto;
 import com.jamsirat.atmapi.dto.request.product.RequestUpdateProductDto;
@@ -12,10 +15,8 @@ import com.jamsirat.atmapi.model.inventory.Product;
 import com.jamsirat.atmapi.repository.ICategoryRepository;
 import com.jamsirat.atmapi.repository.IProductRepository;
 import com.jamsirat.atmapi.service.IProductService;
-import com.jamsirat.atmapi.util.MapperUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,9 +25,9 @@ import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMe
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperSuccessMessage;
 
 
+
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+
 
 
 @Service
@@ -36,6 +37,10 @@ public class ProductServiceImpl implements IProductService {
 
     private final IProductRepository productRepository;
     private final ICategoryRepository categoryRepository;
+    private final ResponseAddProductMapper responseAddProductMapper;
+    private final ResponseDetailProductMapper responseDetailProductMapper;
+    private final ResponseUpdateProductMapper responseUpdateProductMapper;
+
 
     @Override
     public HttpResponse<Object> addProduct(RequestAddProductDto request) {
@@ -51,38 +56,24 @@ public class ProductServiceImpl implements IProductService {
                         .productCategory(categoryProduct)
                         .build();
         productRepository.save(product);
-        ResponseAddProductDto data = MapperUtil.parse(product,ResponseAddProductDto.class,MatchingStrategies.STRICT);
-        data.setProductCategoryName(categoryProduct.getCategoryName());
-        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_ADDED_SUCCESSFULLY,
+        ResponseAddProductDto data = responseAddProductMapper.convert(product);
+        return HttpResponse.build(DeveloperSuccessMessage.DATA_ADDED_SUCCESSFULLY,
                 SuccessMessage.DATA_ADDED_SUCCESSFULLY,
                 HttpStatus.CREATED,
-                HttpStatus.CREATED.value(),
                 data);
     }
 
     @Override
     public HttpResponse<List<ResponseDetailProductDto>> getListProduct() {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = productRepository.findAll().stream()
+                .filter(x -> x.getProductCategory() != null)
+                .toList();
 
-        if (products.isEmpty()) {
-            return HttpResponse.noContent();
-        }
-
-        List<ResponseDetailProductDto> listProduct = products.stream()
-                .map(product -> ResponseDetailProductDto.builder()
-                        .id(product.getId())
-                        .stockProduct(product.getStockProduct())
-                        .productName(product.getProductName())
-                        .descriptionProduct(product.getDescriptionProduct())
-                        .categoryName(product.getProductCategory().getCategoryName())
-                        .build())
-                .collect(Collectors.toList());
-
-        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
+        List<ResponseDetailProductDto> data = responseDetailProductMapper.entitiesIntoDTOs(products);
+        return HttpResponse.build(DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 HttpStatus.OK,
-                HttpStatus.OK.value(),
-                listProduct);
+                data);
 
     }
 
@@ -96,12 +87,10 @@ public class ProductServiceImpl implements IProductService {
         product.setImage(request.getImage());
         product.setProductCategory(categoryProduct);
         productRepository.save(product);
-        ResponseUpdateProductDto responseData =  MapperUtil.parse(product, ResponseUpdateProductDto.class, MatchingStrategies.STRICT);
-        responseData.setCategoryName(categoryProduct.getCategoryName());
-        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_UPDATED_SUCCESSFULLY,
+        ResponseUpdateProductDto responseData =  responseUpdateProductMapper.convert(product);
+        return HttpResponse.build(DeveloperSuccessMessage.DATA_UPDATED_SUCCESSFULLY,
                 SuccessMessage.DATA_UPDATED_SUCCESSFULLY,
                  HttpStatus.OK,
-                 HttpStatus.OK.value(),
                  responseData);
 
         }
@@ -111,28 +100,23 @@ public class ProductServiceImpl implements IProductService {
         var product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException(String.format("Product with id %d is not exist", productId),"please check again your Product id"));
         product.setIsDeleted(true);
         productRepository.save(product);
-        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
+        return HttpResponse.build(DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
                 SuccessMessage.DATA_DELETED_SUCCESSFULLY,
                 HttpStatus.OK,
-                HttpStatus.OK.value(),
                 null);
     }
 
     @Override
     public HttpResponse<Object> getDetailProduct(Long productId) {
-        var product = productRepository.findById(productId);
+        var product = productRepository.findByIdAndProductCategoryIsNotNull(productId);
         if (product.isEmpty()) {
             return HttpResponse.noContent();
         }
-        Product productOptional = product.get();
-        ResponseDetailProductDto data = MapperUtil.parse(productOptional, ResponseDetailProductDto.class, MatchingStrategies.STRICT);
-        data.setCategoryName(Objects.isNull(productOptional.getProductCategory())
-                ? null
-                : productOptional.getProductCategory().getCategoryName());
-        return HttpResponse.buildHttpResponse(SuccessMessage.DATA_FETCH_SUCCESSFULLY,
+
+        ResponseDetailProductDto data = responseDetailProductMapper.convert(product.get());
+        return HttpResponse.build(SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 HttpStatus.OK,
-                HttpStatus.OK.value(),
                 data);
     }
 

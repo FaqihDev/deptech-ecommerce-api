@@ -1,26 +1,25 @@
 package com.jamsirat.atmapi.service.impl;
 
 
+
+import com.jamsirat.atmapi.Mapper.user.ResponseUpdateUserMapper;
+import com.jamsirat.atmapi.Mapper.user.ResponseUserDetailMapper;
 import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.dto.request.user.RequestUpdateUserDto;
 import com.jamsirat.atmapi.dto.response.user.ResponseDetailUserDto;
 import com.jamsirat.atmapi.dto.response.user.ResponseUpdateUserDto;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
-import com.jamsirat.atmapi.exception.HandlerJwtExpiredTokenException;
 import com.jamsirat.atmapi.exception.IllegalHeaderException;
-import com.jamsirat.atmapi.model.auth.Role;
 import com.jamsirat.atmapi.model.auth.User;
 import com.jamsirat.atmapi.repository.IUserRepository;
 import com.jamsirat.atmapi.service.IUserService;
-import com.jamsirat.atmapi.util.MapperUtil;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.ExceptionMessage;
@@ -29,10 +28,9 @@ import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMe
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperSuccessMessage;
 
 
-
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
@@ -40,6 +38,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements IUserService {
 
     private final IUserRepository userRepository;
+    private final ResponseUserDetailMapper userDetailMapper;
+    private final ResponseUpdateUserMapper responseUpdateUserMapper;
+
 
     @Override
     public HttpResponse<List<ResponseDetailUserDto>> getListUsers() {
@@ -47,18 +48,11 @@ public class UserServiceImpl implements IUserService {
         if (users.isEmpty()) {
             return HttpResponse.noContent();
         }
-        List<ResponseDetailUserDto> listUsers = users.stream()
-                .map(user -> {
-                    ResponseDetailUserDto dto = MapperUtil.parse(user, ResponseDetailUserDto.class, MatchingStrategies.STRICT);
-                    dto.setRole(user.getRoles().stream().map(Role::getRoleName).collect(Collectors.joining(", ")));
-                    return dto;
-                })
-                .collect(Collectors.toList());
 
-        return HttpResponse.buildHttpResponse(SuccessMessage.DATA_FETCH_SUCCESSFULLY,
+        List<ResponseDetailUserDto> listUsers = userDetailMapper.entitiesIntoDTOs(users);
+        return HttpResponse.build(SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 HttpStatus.OK,
-                HttpStatus.OK.value(),
                 listUsers);
 
     }
@@ -70,11 +64,10 @@ public class UserServiceImpl implements IUserService {
         user.setLastName(request.getLastName());
         userRepository.save(user);
 
-        ResponseUpdateUserDto responseData =  MapperUtil.parse(user, ResponseUpdateUserDto.class, MatchingStrategies.STRICT);
-        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_UPDATED_SUCCESSFULLY,
+        ResponseUpdateUserDto responseData =  responseUpdateUserMapper.convert(user);
+        return HttpResponse.build(DeveloperSuccessMessage.DATA_UPDATED_SUCCESSFULLY,
                 SuccessMessage.DATA_UPDATED_SUCCESSFULLY,
                  HttpStatus.OK,
-                 HttpStatus.OK.value(),
                  responseData);
 
         }
@@ -84,46 +77,33 @@ public class UserServiceImpl implements IUserService {
         var userById = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException(String.format("user with id %d is not exist", userId),"please check again your user id"));
         userById.setIsDeleted(true);
         userRepository.save(userById);
-        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
+        return HttpResponse.build(DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
                 SuccessMessage.DATA_DELETED_SUCCESSFULLY,
                 HttpStatus.OK,
-                HttpStatus.OK.value(),
                 null);
     }
 
     @Override
-    public HttpResponse<Object> getDetailUsers(HttpServletRequest request) {
+    public HttpResponse<Object> getDetailUsers(HttpServletRequest request)  {
 
         User user = null;
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        try {
             if (Objects.nonNull(authHeader) && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
                 try {
                     user = userRepository.findByToken(token);
-                } catch (Exception e) {
-                    throw new HandlerJwtExpiredTokenException(ExceptionMessage.TOKEN_IS_INVALID);
+                } catch (JwtException e) {
+                    HttpResponse.InvalidatedToken();
                 }
-
-                String roles = user.getRoles().stream()
-                        .map(role -> role.getUserRole().getName())
-                        .collect(Collectors.joining(", "));
-                ResponseDetailUserDto data = MapperUtil.parse(user,ResponseDetailUserDto.class,MatchingStrategies.STRICT);
-                data.setRole(roles);
-
-                return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
+                assert user != null;
+                ResponseDetailUserDto dataUser = userDetailMapper.convert(user);
+                return HttpResponse.build(DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
                         SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                         HttpStatus.OK,
-                        HttpStatus.OK.value(),
-                        data);
+                        dataUser);
 
             }
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(
-                    HttpResponse.UnAuthorized()
-            ).getBody();
-        }
-        throw new IllegalHeaderException(ExceptionMessage.AUTHORIZATION_HEADER_INVALID,DeveloperExceptionMessage.AUTHORIZATION_HEADER_INVALID);
+          throw new IllegalHeaderException(ExceptionMessage.AUTHORIZATION_HEADER_INVALID,DeveloperExceptionMessage.AUTHORIZATION_HEADER_INVALID);
     }
 
 }

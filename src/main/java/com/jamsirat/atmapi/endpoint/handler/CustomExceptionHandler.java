@@ -2,11 +2,12 @@ package com.jamsirat.atmapi.endpoint.handler;
 
 import com.jamsirat.atmapi.dto.base.HttpResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+
 
 import java.time.LocalDateTime;
 
-@Service
+@Component
 public class CustomExceptionHandler {
     public HttpResponse<?> createHttpResponse(HttpStatus status, String message, String developerMessage) {
         return HttpResponse.builder()

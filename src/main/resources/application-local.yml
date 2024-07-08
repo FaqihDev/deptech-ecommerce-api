@@ -1,10 +1,11 @@
 server:
   port: 8084
+
 spring:
   jpa:
     hibernate:
-      ddl-auto : update
-      show-sql : true
+      ddl-auto: update
+      show-sql: true
   servlet:
     multipart:
       max-file-size: 3MB
@@ -12,10 +13,10 @@ spring:
   application:
     name: ATM Web App
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/deptech_ecommerce_api
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/deptech_ecommerce_api
     username: faqih
-    password: passwordpostgres
+    password: passwordmysql  # Replace with your MySQL password
 
 application:
   security:
@@ -24,7 +25,7 @@ application:
       expiration: 86400000 # a day
       refresh-token: 604800000 # 7 days
 
-#LOGGING
+# LOGGING
 logging:
   level:
     com:
@@ -32,7 +33,7 @@ logging:
         orderServices: debug
     org:
       hibernate:
-        SQL : debug
+        SQL: debug
         type:
           descriptor:
             sql:

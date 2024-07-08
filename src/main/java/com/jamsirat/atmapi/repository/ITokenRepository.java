@@ -20,7 +20,4 @@ public interface ITokenRepository extends JpaRepository<Token,Long> {
 
     Optional<Token> findByToken(String token);
 
-    List<Token> findByUser(User user);
-
-
 }

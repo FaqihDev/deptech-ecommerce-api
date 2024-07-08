@@ -14,11 +14,6 @@ public interface IApplicationConstant {
 
     interface Path{
 
-        interface Cart {
-            String ADD_CART = "/cart/add-cart";
-            String GET_CART = "/cart/get-cart";
-        }
-
         interface User {
             String USER_DETAIL = "/user-detail";
             String UPDATE_USER ="/update-user";
@@ -56,20 +51,18 @@ public interface IApplicationConstant {
             String LOGIN = "/login";
             String REFRESH_TOKEN = "/refresh-token";
             String LOGOUT = "logout";
-            String VERIFY_ACCOUNT = "/verifyEmail";
         }
 
 
     }
 
-    interface  DefaultNumber {
-        Long OUT_OF_STOCK = 0L;
-
-    }
 
     interface StaticDefaultMessage {
 
             interface ExceptionMessage {
+                String EMAIL_VALID_FORMAT = "Email does not valid";
+                String EMAIL_NOT_NULL = "Email may not be null";
+                String FIRST_NAME_NOT_NULL = "First name may not be null";
                 String DATA_NOT_FOUND_EXCEPTION = "Data is not found";
                 String USER_NOT_FOUND_EXCEPTION = "User does not exists";
                 String USERNAME_NOT_FOUND = "Username is not found";
@@ -86,16 +79,12 @@ public interface IApplicationConstant {
 
             interface DeveloperExceptionMessage {
                 String DATA_NOT_FOUND_EXCEPTION = "Please check your request data";
-                String USERNAME_NOT_FOUND = "Please check your username";
-                String USER_NOT_FOUND_EXCEPTION = "Make sure user id is correct";
                 String USER_NOT_ACTIVATED_EXCEPTION = "Please activate your account";
                 String EMAIL_ALREADY_TAKEN = "Please choose another email";
                 String ROLE_NOT_FOUND = "Please check your database";
-                String FAILED_DATA_USER = "Please check your token";
                 String PRODUCT_NOT_FOUND_EXCEPTION = "Make sure product id is correct";
                 String OUT_OF_STOCK_EXCEPTION = "Please contact your Administrator";
                 String TOKEN_IS_INVALID       = "Please do login";
-                String BAD_CREDENTIALS = "Please check your email and password";
                 String AUTHORIZATION_HEADER_INVALID = "Please check your header";
             }
 
@@ -109,6 +98,7 @@ public interface IApplicationConstant {
                 String LOGOUT_MSG_SUCCESS = "Logout successful";
                 String VERIFY_ACCOUNT  = " Please Verify your account";
                 String LOGIN_SUCCESSFUL = "Login account successfully";
+                String REGISTRATION_SUCCESSFUL = "Please login to continue";
             }
 
             interface DeveloperSuccessMessage {
@@ -121,6 +111,7 @@ public interface IApplicationConstant {
                 String LOGOUT_MSG_SUCCESS = "Please do login to continue";
                 String VERIFY_ACCOUNT = "Verification link was sent to your email";
                 String LOGIN_SUCCESSFUL = "Profile we trust!";
+                String REGISTRATION_SUCCESSFUL = "Registration Successful";
             }
 
     }

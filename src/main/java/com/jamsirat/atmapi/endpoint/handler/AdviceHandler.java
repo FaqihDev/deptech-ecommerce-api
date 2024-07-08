@@ -3,6 +3,7 @@ package com.jamsirat.atmapi.endpoint.handler;
 import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.exception.*;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,7 +38,7 @@ public class AdviceHandler {
 
     @ExceptionHandler(UserProfileAlreadyAddedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public HttpResponse UnauhtorizedEmailUser(UserProfileAlreadyAddedException e) {
+    public HttpResponse UnauthorizedEmailUser(UserProfileAlreadyAddedException e) {
         return customExceptionHandler.createHttpResponse(HttpStatus.BAD_REQUEST,e.getExceptionMessage(),e.getDeveloperMessage());
     }
     @ExceptionHandler(EmailNotVerifiedException.class)
@@ -116,11 +118,6 @@ public class AdviceHandler {
                 .collect(Collectors.joining(", "));
     }
 
-    @ExceptionHandler(TokenIsExpiredException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public HttpResponse handleInvalidToken(TokenIsExpiredException e) {
-        return customExceptionHandler.createHttpResponse(HttpStatus.BAD_REQUEST, e.getExceptionMessage(), e.getDeveloperMessage());
-    }
 
     @ExceptionHandler(IllegalHeaderException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -134,11 +131,37 @@ public class AdviceHandler {
         return customExceptionHandler.createHttpResponse(HttpStatus.UNAUTHORIZED, e.getExceptionMessage(), e.getDeveloperMessage());
     }
 
-    @ExceptionHandler(HandlerJwtExpiredTokenException.class)
+    @ExceptionHandler(ExpiredJwtException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public HttpResponse handleExpiredJwtException(HandlerJwtExpiredTokenException e) {
+    public HttpResponse handleExpiredJwtException(ExpiredJwtException e) {
         String message = "JWT token has expired";
-        String developerMessage = "Please login !";
+        String developerMessage = "Please login again.";
         return customExceptionHandler.createHttpResponse(HttpStatus.UNAUTHORIZED, message, developerMessage);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public HttpResponse handleJwtException(JwtException e) {
+        String message = "Invalid JWT token";
+        String developerMessage = "The token provided is invalid.";
+        return customExceptionHandler.createHttpResponse(HttpStatus.UNAUTHORIZED, message, developerMessage);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public HttpResponse handleRuntimeException(RuntimeException e) {
+        return customExceptionHandler.createHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred", e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public HttpResponse handleRuntimeException(Exception e) {
+        return customExceptionHandler.createHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred", e.getMessage());
+    }
+
+    @ExceptionHandler(IOException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public HttpResponse handleRuntimeException(IOException e) {
+        return customExceptionHandler.createHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred", e.getMessage());
     }
 }

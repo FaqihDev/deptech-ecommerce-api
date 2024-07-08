@@ -11,6 +11,8 @@ spring:
       max-request-size: 3MB
   application:
     name: deptech_ecommerce_api
+#  profiles:
+#    active: local
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/deptech_ecommerce_api

@@ -18,7 +18,7 @@ public abstract class ADATAMapper<SOURCE,TARGET> implements IDATAMapper<SOURCE,T
 
     @Override
     public List<TARGET> entitiesIntoDTOs(Iterable<SOURCE> entities) {
-        List<SOURCE> sources = new ArrayList<SOURCE>();
+        List<SOURCE> sources = new ArrayList<>();
         entities.forEach(sources::add);
         prepareData(sources);
         this.isBatch = true;
@@ -55,7 +55,7 @@ public abstract class ADATAMapper<SOURCE,TARGET> implements IDATAMapper<SOURCE,T
     }
 
     @Override
-    public ConvertResponseEntity convertWithResponseEntity(SOURCE source) {
+    public ConvertResponseEntity<Object> convertWithResponseEntity(SOURCE source) {
         return null;
     }
 

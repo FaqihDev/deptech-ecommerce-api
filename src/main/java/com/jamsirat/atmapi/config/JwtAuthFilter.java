@@ -1,13 +1,15 @@
 package com.jamsirat.atmapi.config;
 
-import com.jamsirat.atmapi.exception.HandlerJwtExpiredTokenException;
+import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.repository.ITokenRepository;
 import com.jamsirat.atmapi.service.impl.JwtService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,18 +38,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final ITokenRepository tokenRepository;
 
 
+    @SneakyThrows
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest httpServletRequest,
                                     @NonNull HttpServletResponse httpServletResponse,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        //check if the url is authentication
         if (httpServletRequest.getServletPath().contains("/api/v1/auth")) {
             filterChain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
 
-        //check if the header contain Authorization
         String AUTHORIZATION_HEADER = "Authorization";
         final String authHeader = httpServletRequest.getHeader(AUTHORIZATION_HEADER);
         final String jwt;
@@ -60,38 +61,42 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         jwt = authHeader.substring(7);
         userEmail = jwtService.extractUsername(jwt);
-        //check for new user
+       try {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             //get the user from userDetails
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            var isTokenValid = tokenRepository.findByToken(jwt)
-                    .map(token -> !token.isTokenExpired() && !token.isRevoked())
-                    .orElse(false);
 
-            log.info("is token valid {}", isTokenValid );
-            //recheck if token is valid belongs to user
-            if (jwtService.isTokenValid(jwt,userDetails) && Boolean.TRUE.equals(isTokenValid)) {
-                String roles = jwtService.extractRoles(jwt);
+                var isTokenValid = tokenRepository.findByToken(jwt)
+                        .map(token -> !token.isTokenExpired() && !token.isRevoked())
+                        .orElseThrow(() -> new JwtException("JWT token has expired or invalid"));
 
-                if (Objects.nonNull(roles)) {
-                    List<SimpleGrantedAuthority> authorities = Arrays.stream(roles.split(","))
-                            .map(SimpleGrantedAuthority::new)
-                            .toList();
+                log.info("is token valid {}", isTokenValid );
+                //recheck if token is valid belongs to user
+                if (jwtService.isTokenValid(jwt,userDetails) && Boolean.TRUE.equals(isTokenValid)) {
+                    String roles = jwtService.extractRoles(jwt);
+                    if (Objects.nonNull(roles)) {
+                        List<SimpleGrantedAuthority> authorities = Arrays.stream(roles.split(","))
+                                .map(SimpleGrantedAuthority::new)
+                                .toList();
 
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(userDetails,null,authorities);
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                    log.info("authenticated set with roles  {}", userDetails.getAuthorities());
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(userDetails,null,authorities);
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                        log.info("authenticated set with roles  {}", userDetails.getAuthorities());
+                    } else {
+                        log.info("no roles found");
+                    }
                 } else {
-                    log.info("no roles found");
+                    HttpResponse.InvalidatedToken();
                 }
             } else {
-                throw new HandlerJwtExpiredTokenException("JWT token has expired or invalid");
+                log.info("User email is null or security context is already contains authentications");
             }
-        } else {
-            log.info("User email is null or security context is already contains authentications");
-        }
+            } catch (JwtException e) {
+                 HttpResponse.InvalidatedToken();
+            }
+        //check for new user
         filterChain.doFilter(httpServletRequest,httpServletResponse);
     }
 }

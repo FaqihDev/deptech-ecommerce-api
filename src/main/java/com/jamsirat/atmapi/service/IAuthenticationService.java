@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 
+import java.io.IOException;
+
 public interface IAuthenticationService {
 
      HttpResponse<Object> register(RegistrationRequest request);
@@ -20,6 +22,6 @@ public interface IAuthenticationService {
 
      HttpResponse<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication);
 
-
+     void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
 }

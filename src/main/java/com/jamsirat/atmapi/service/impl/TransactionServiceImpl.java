@@ -8,7 +8,6 @@ import com.jamsirat.atmapi.dto.request.order.TransactionRequestProductDto;
 import com.jamsirat.atmapi.dto.response.order.ResponseTransactionDto;
 import com.jamsirat.atmapi.dto.response.order.ResponseTransactionHistoryDto;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
-import com.jamsirat.atmapi.exception.HandlerJwtExpiredTokenException;
 import com.jamsirat.atmapi.exception.OutOfStockException;
 import com.jamsirat.atmapi.model.auth.User;
 import com.jamsirat.atmapi.model.inventory.Product;
@@ -99,7 +98,7 @@ public class TransactionServiceImpl implements ITransactionHistoryService {
         orderSalesItems.forEach(orderSalesItem -> orderSalesItem.setOrderSales(orderSales));
         orderSalesHistory.save(orderSales);
         ResponseTransactionDto response = transactionMapper.convert(orderSales);
-        return HttpResponse.buildHttpResponse(SuccessMessage.TRANSACTION_SUCCESS,DeveloperSuccessMessage.TRANSACTION_SUCCESS, HttpStatus.CREATED,HttpStatus.CREATED.value(), response);
+        return HttpResponse.build(SuccessMessage.TRANSACTION_SUCCESS,DeveloperSuccessMessage.TRANSACTION_SUCCESS, HttpStatus.CREATED,response);
     }
 
     @Override
@@ -107,7 +106,7 @@ public class TransactionServiceImpl implements ITransactionHistoryService {
         var orderSales = orderSalesHistory.findAll();
         List <ResponseTransactionHistoryDto> response = transactionHistoryMapper.entitiesIntoDTOs(orderSales);
         return HttpResponse
-                .buildHttpResponse(SuccessMessage.TRANSACTION_HISTORY,DeveloperSuccessMessage.TRANSACTION_HISTORY,HttpStatus.OK,HttpStatus.OK.value(),response);
+                .build(SuccessMessage.TRANSACTION_HISTORY,DeveloperSuccessMessage.TRANSACTION_HISTORY,HttpStatus.OK,response);
 
     }
 
@@ -169,7 +168,7 @@ public class TransactionServiceImpl implements ITransactionHistoryService {
                     return user;
 
                 } catch (Exception e) {
-                    throw new HandlerJwtExpiredTokenException("JWT Token has expired or invalid");
+                    HttpResponse.InvalidatedToken();
                 }
             }
         } catch (Exception e) {

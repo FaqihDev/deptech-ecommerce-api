@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ResponseUpdateUserDto {
-    private String id;
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
+    private String role;
 }

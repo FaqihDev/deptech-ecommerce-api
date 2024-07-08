@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.ExceptionMessage;
+
+
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -49,17 +53,16 @@ public class User extends AAuditableBase implements UserDetails, Serializable {
     private Set<Role> roles = new HashSet<>();
 
     @NotNull
-    @NotBlank(message = "FirstName is mandatory")
+    @NotBlank(message = ExceptionMessage.FIRST_NAME_NOT_NULL)
     @Column(name = "first_name")
     private String firstName;
 
     @NotNull
-    @NotBlank(message = "Last name is mandatory")
     @Column(name = "last_name")
     private String lastName;
 
-    @Email(message = "Email should be valid")
-    @NotBlank(message = "Email is mandatory")
+    @Email(message = ExceptionMessage.EMAIL_VALID_FORMAT)
+    @NotBlank(message = ExceptionMessage.EMAIL_NOT_NULL)
     @Column(name = "email")
     private String email;
 

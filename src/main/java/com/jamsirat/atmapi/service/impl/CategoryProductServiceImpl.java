@@ -1,5 +1,8 @@
 package com.jamsirat.atmapi.service.impl;
 
+import com.jamsirat.atmapi.Mapper.category.ResponseAddCategoryMapper;
+import com.jamsirat.atmapi.Mapper.category.ResponseDetailCategoryMapper;
+import com.jamsirat.atmapi.Mapper.category.ResponseUpdateCategoryMapper;
 import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.dto.request.category.RequestAddCategoryProductDto;
 import com.jamsirat.atmapi.dto.request.category.RequestUpdateCategoryProductDto;
@@ -9,22 +12,20 @@ import com.jamsirat.atmapi.dto.response.category.ResponseUpdateCategoryProductDt
 import com.jamsirat.atmapi.exception.DataNotFoundException;
 import com.jamsirat.atmapi.model.inventory.CategoryProduct;
 import com.jamsirat.atmapi.repository.ICategoryRepository;
+import com.jamsirat.atmapi.repository.IProductRepository;
 import com.jamsirat.atmapi.service.ICategoryProductService;
-import com.jamsirat.atmapi.util.MapperUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.SuccessMessage;
-import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.ExceptionMessage;
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperSuccessMessage;
-import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperExceptionMessage;
+
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
@@ -32,6 +33,11 @@ import java.util.stream.Collectors;
 public class CategoryProductServiceImpl implements ICategoryProductService {
 
     private final ICategoryRepository categoryRepository;
+    private final IProductRepository productRepository;
+    private final ResponseAddCategoryMapper responseAddCategoryMapper;
+    private final ResponseDetailCategoryMapper responseDetailCategoryMapper;
+    private final ResponseUpdateCategoryMapper responseUpdateCategoryMapper;
+
 
 
     @Override
@@ -43,11 +49,10 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
                         .build();
 
         categoryRepository.save(categoryProduct);
-        ResponseAddCategoryProductDto data = MapperUtil.parse(categoryProduct,ResponseAddCategoryProductDto.class,MatchingStrategies.STRICT);
-        return HttpResponse.buildHttpResponse(SuccessMessage.DATA_ADDED_SUCCESSFULLY,
+        ResponseAddCategoryProductDto data = responseAddCategoryMapper.convert(categoryProduct);
+        return HttpResponse.build(SuccessMessage.DATA_ADDED_SUCCESSFULLY,
                 DeveloperSuccessMessage.DATA_ADDED_SUCCESSFULLY,
                 HttpStatus.CREATED,
-                HttpStatus.CREATED.value(),
                 data);
 
     }
@@ -58,14 +63,12 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
         if (categories.isEmpty()) {
             return HttpResponse.noContent();
         }
-        List<ResponseDetailCategoryProductDto> data = categories.stream()
-                .map(category -> MapperUtil.parse(category, ResponseDetailCategoryProductDto.class, MatchingStrategies.STRICT))
-                .collect(Collectors.toList());
-        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
+
+        List<ResponseDetailCategoryProductDto> listsData = responseDetailCategoryMapper.entitiesIntoDTOs(categories);
+        return HttpResponse.build(DeveloperSuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                 HttpStatus.OK,
-                HttpStatus.OK.value(),
-                data);
+                listsData);
     }
 
     @Override
@@ -73,24 +76,25 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
         var categoryProduct = categoryRepository.findById(request.getId()).orElseThrow(() ->  new DataNotFoundException(String.format("CategoryProduct with id %d is not exist", request.getId()),"please check again your CategoryProduct id"));
         categoryProduct.setCategoryName(request.getCategoryName());
         categoryProduct.setDescriptionCategory(request.getDescriptionCategory());
-        ResponseUpdateCategoryProductDto responseData =  MapperUtil.parse(categoryProduct, ResponseUpdateCategoryProductDto.class, MatchingStrategies.STRICT);
-        return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_UPDATED_SUCCESSFULLY,
+        ResponseUpdateCategoryProductDto data =  responseUpdateCategoryMapper.convert(categoryProduct);
+
+        return HttpResponse.build(DeveloperSuccessMessage.DATA_UPDATED_SUCCESSFULLY,
                 SuccessMessage.DATA_UPDATED_SUCCESSFULLY,
                 HttpStatus.OK,
-                HttpStatus.OK.value(),
-                responseData);
+                data);
 
     }
 
     @Override
     public HttpResponse<Object> deleteCategoryProduct(Long categoryId) {
-        var CategoryProduct = categoryRepository.findById(categoryId).orElseThrow(() -> new DataNotFoundException(String.format("CategoryProduct with id %d is not exist", categoryId),"please check again your CategoryProduct id"));
-        CategoryProduct.setIsDeleted(true);
-        categoryRepository.save(CategoryProduct);
-        return HttpResponse.buildHttpResponse(SuccessMessage.DATA_DELETED_SUCCESSFULLY,
+        var categoryProduct = categoryRepository.findById(categoryId).orElseThrow(() -> new DataNotFoundException(String.format("CategoryProduct with id %d is not exist", categoryId),"please check again your CategoryProduct id"));
+        var productsByCategories = productRepository.findByProductCategory(categoryProduct);
+        productsByCategories.forEach(product -> product.setIsDeleted(true));
+        categoryProduct.setIsDeleted(true);
+        categoryRepository.save(categoryProduct);
+        return HttpResponse.build(SuccessMessage.DATA_DELETED_SUCCESSFULLY,
                 DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
                 HttpStatus.OK,
-                HttpStatus.OK.value(),
                 null);
     }
 
@@ -99,11 +103,11 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
         var categoryProductOptional = categoryRepository.findById(categoryId);
         if (categoryProductOptional.isPresent()) {
             CategoryProduct categoryProduct = categoryProductOptional.get();
-            ResponseDetailCategoryProductDto data = MapperUtil.parse(categoryProduct, ResponseDetailCategoryProductDto.class, MatchingStrategies.STRICT);
-            return HttpResponse.buildHttpResponse(DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
+
+            ResponseDetailCategoryProductDto data = responseDetailCategoryMapper.convert(categoryProduct);
+            return HttpResponse.build(DeveloperSuccessMessage.DATA_DELETED_SUCCESSFULLY,
                     SuccessMessage.DATA_FETCH_SUCCESSFULLY,
                     HttpStatus.OK,
-                    HttpStatus.OK.value(),
                     data);
         }
         return HttpResponse.noContent();

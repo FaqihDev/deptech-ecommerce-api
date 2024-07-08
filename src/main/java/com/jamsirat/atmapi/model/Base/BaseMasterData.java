@@ -1,7 +1,6 @@
 package com.jamsirat.atmapi.model.Base;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

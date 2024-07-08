@@ -1,6 +1,8 @@
 package com.jamsirat.atmapi.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jamsirat.atmapi.Mapper.authentication.ResponseLoginMapper;
+import com.jamsirat.atmapi.Mapper.authentication.ResponseRegistrationMapper;
 import com.jamsirat.atmapi.dto.request.user.LoginRequest;
 import com.jamsirat.atmapi.dto.request.user.RegistrationRequest;
 import com.jamsirat.atmapi.dto.base.HttpResponse;
@@ -53,6 +55,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final ResponseRegistrationMapper responseRegistrationMapper;
+    private final ResponseLoginMapper loginMapper;
     private final LogoutServiceImpl logoutService;
 
     @Override
@@ -70,7 +74,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             log.error("Error find Role by Code {} : {} %s".formatted(EUserRole.ROLE_USER), e.toString());
             throw new DataNotFoundException(ExceptionMessage.ROLE_NOT_FOUND,DeveloperExceptionMessage.ROLE_NOT_FOUND);
         }
-
            var userByEmail = userRepository.findByEmail(request.getEmail());
            if (userByEmail.isPresent()) {
                throw new UserAlreadyExistException(ExceptionMessage.EMAIL_ALREADY_TAKEN,DeveloperExceptionMessage.EMAIL_ALREADY_TAKEN);
@@ -89,21 +92,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                var jwtToken = jwtService.generateToken(currentUser);
                saveUserToken(currentUser,jwtToken);
 
-
-        ResponseRegistrationDto response = ResponseRegistrationDto.builder()
-                .name(user.getFirstName() + " " + user.getLastName())
-                .role(EUserRole.ROLE_USER.getName())
-                .email(user.getEmail())
-                .build();
-
-        return HttpResponse.builder()
-                        .timeStamp(LocalDateTime.now().toString())
-                        .developerMessage(SuccessMessage.VERIFY_ACCOUNT)
-                        .message(DeveloperSuccessMessage.VERIFY_ACCOUNT)
-                        .statusCode(HttpStatus.CREATED.value())
-                        .status(HttpStatus.CREATED)
-                        .data(response)
-                        .build();
+               ResponseRegistrationDto data = responseRegistrationMapper.convert(user);
+               return HttpResponse.build(DeveloperSuccessMessage.LOGIN_SUCCESSFUL,SuccessMessage.LOGIN_SUCCESSFUL,HttpStatus.CREATED,data);
 
     }
 
@@ -133,31 +123,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
        }
 
        var user = userRepository.findByEmail(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION));
-       var jwtToken = jwtService.generateToken(user);
-       var refreshToken = jwtService.refreshToken(user);
-
-        String roles = user.getRoles().stream()
-                .map(role -> role.getUserRole().getName())
-                .collect(Collectors.joining(", "));
-
-        ResponseLoginDto response = ResponseLoginDto.builder()
-                        .name(user.getFirstName())
-                        .role(roles)
-                        .email(user.getEmail())
-                        .accessToken(jwtToken)
-                        .refreshToken(refreshToken)
-                        .build();
+       String accessToken = jwtService.generateToken(user);
+       ResponseLoginDto data = loginMapper.convert(user);
 
         revokeAllUserToken(user);
-        saveUserToken(user,jwtToken);
-        return HttpResponse.builder()
-                .message(SuccessMessage.LOGIN_SUCCESSFUL)
-                .timeStamp(LocalDateTime.now().toString())
-                .status(HttpStatus.OK)
-                .statusCode(HttpStatus.OK.value())
-                .developerMessage(DeveloperSuccessMessage.LOGIN_SUCCESSFUL)
-                .data(response)
-                .build();
+        saveUserToken(user,accessToken);
+        return HttpResponse.build(DeveloperSuccessMessage.LOGIN_SUCCESSFUL,SuccessMessage.LOGIN_SUCCESSFUL,HttpStatus.OK,data);
     }
 
     @Override
@@ -176,8 +147,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     @Override
     public HttpResponse<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         logoutService.logout(request,response,authentication);
-        return HttpResponse.buildHttpResponse(SuccessMessage.LOGOUT_MSG_SUCCESS
-                ,DeveloperSuccessMessage.LOGOUT_MSG_SUCCESS,HttpStatus.OK,HttpStatus.OK.value(), null);
+        return HttpResponse.build(SuccessMessage.LOGOUT_MSG_SUCCESS
+                ,DeveloperSuccessMessage.LOGOUT_MSG_SUCCESS,HttpStatus.OK,HttpStatus.OK);
     }
 
 
@@ -194,6 +165,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
 
+    @Override
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = request.getHeader("Authorization");
         final String refreshToken;
