@@ -2,6 +2,7 @@ package com.jamsirat.atmapi.endpoint.handler;
 
 import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.exception.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class AdviceHandler {
     @ExceptionHandler(DataNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpResponse handleDataNotFoundException(DataNotFoundException e) {
-        return customExceptionHandler.createHttpResponse(HttpStatus.NOT_FOUND,e.getExceptionMessage(),e.getDeveloperMessage());
+        return customExceptionHandler.createHttpResponse(HttpStatus.NO_CONTENT,e.getExceptionMessage(),e.getDeveloperMessage());
     }
 
     @ExceptionHandler(OutOfStockException.class)
@@ -131,5 +132,13 @@ public class AdviceHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public HttpResponse handleAccessDenied(AccessDeniedException e) {
         return customExceptionHandler.createHttpResponse(HttpStatus.UNAUTHORIZED, e.getExceptionMessage(), e.getDeveloperMessage());
+    }
+
+    @ExceptionHandler(HandlerJwtExpiredTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public HttpResponse handleExpiredJwtException(HandlerJwtExpiredTokenException e) {
+        String message = "JWT token has expired";
+        String developerMessage = "Please login !";
+        return customExceptionHandler.createHttpResponse(HttpStatus.UNAUTHORIZED, message, developerMessage);
     }
 }

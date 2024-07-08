@@ -2,6 +2,7 @@ package com.jamsirat.atmapi.model.auth;
 
 
 import com.jamsirat.atmapi.model.Base.AAuditableBase;
+import com.jamsirat.atmapi.model.order.OrderSales;
 import com.jamsirat.atmapi.statval.enumeration.EGender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -77,6 +78,9 @@ public class User extends AAuditableBase implements UserDetails, Serializable {
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    @OneToMany(mappedBy = "user")
+    private List<OrderSales> orderSales;
 
 
     public User(Set<String> roleNames, String firstName, String lastName, String email, String password, Boolean isActive) {

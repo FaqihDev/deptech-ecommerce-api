@@ -26,9 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.SuccessMessage;
+
+import com.jamsirat.atmapi.statval.constant.IApplicationConstant.StaticDefaultMessage.DeveloperSuccessMessage;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -48,6 +52,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final LogoutServiceImpl logoutService;
 
     @Override
     @Transactional
@@ -100,8 +105,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                         .build();
 
     }
-
-
 
     @Override
     public void saveUserToken(User user, String token) {
@@ -169,6 +172,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         return "valid";
     }
 
+    @Override
+    public HttpResponse<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        logoutService.logout(request,response,authentication);
+        return HttpResponse.buildHttpResponse(SuccessMessage.LOGOUT_MSG_SUCCESS
+                ,DeveloperSuccessMessage.LOGOUT_MSG_SUCCESS,HttpStatus.OK,HttpStatus.OK.value(), null);
+    }
 
 
     private void revokeAllUserToken(User user) {

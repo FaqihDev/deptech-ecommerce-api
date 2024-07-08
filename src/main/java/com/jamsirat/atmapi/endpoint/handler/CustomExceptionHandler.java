@@ -8,8 +8,7 @@ import java.time.LocalDateTime;
 
 @Service
 public class CustomExceptionHandler {
-
-    public HttpResponse createHttpResponse(HttpStatus status, String message, String developerMessage) {
+    public HttpResponse<?> createHttpResponse(HttpStatus status, String message, String developerMessage) {
         return HttpResponse.builder()
                 .timeStamp(LocalDateTime.now().toString())
                 .status(status)

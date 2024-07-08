@@ -4,6 +4,9 @@ import com.jamsirat.atmapi.dto.request.user.LoginRequest;
 import com.jamsirat.atmapi.dto.request.user.RegistrationRequest;
 import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.model.auth.User;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
 
 public interface IAuthenticationService {
 
@@ -14,6 +17,8 @@ public interface IAuthenticationService {
      HttpResponse<Object> login (LoginRequest loginRequest);
 
      String validateToken(String token);
+
+     HttpResponse<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication);
 
 
 

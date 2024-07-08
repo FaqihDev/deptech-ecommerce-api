@@ -1,17 +1,22 @@
 package com.jamsirat.atmapi.endpoint;
 
-import com.jamsirat.atmapi.dto.request.category.RequestAddCategoryProductDto;
+
+import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.dto.request.product.RequestAddProductDto;
-import com.jamsirat.atmapi.dto.request.product.RequestDetailProductDto;
 import com.jamsirat.atmapi.dto.request.product.RequestUpdateProductDto;
+import com.jamsirat.atmapi.dto.response.product.ResponseDetailProductDto;
 import com.jamsirat.atmapi.service.IProductService;
 import com.jamsirat.atmapi.statval.constant.IApplicationConstant;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = IApplicationConstant.ContextPath.PRODUCT,
@@ -23,28 +28,72 @@ public class ProductEndpoint {
 
     @PostMapping(IApplicationConstant.Path.Product.ADD_PRODUCT)
     public ResponseEntity<?> addProduct(@RequestBody RequestAddProductDto request) {
-        return ResponseEntity.ok(productService.addProduct(request));
+        try {
+            HttpResponse<?> response = productService.addProduct(request);
+            if (Objects.nonNull(response) && Objects.nonNull(response.getData())) {
+                return ResponseEntity.ok(response);
+            }
+            return ResponseEntity.ok(HttpResponse.noContent());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(HttpResponse.buildHttpResponse("An error occurred", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), null));
+        }
     }
 
     @GetMapping(IApplicationConstant.Path.Product.LIST_PRODUCT)
     public ResponseEntity<?> fetchProducts() {
-        return ResponseEntity.ok(productService.getListProduct());
-    }
-
-    @GetMapping(IApplicationConstant.Path.Product.PRODUCT_DETAIL)
-    public ResponseEntity<?> detailProduct(Long productId) {
-        return ResponseEntity.ok(productService.getDetailProduct(productId));
+        try {
+            HttpResponse<List<ResponseDetailProductDto>> response = productService.getListProduct();
+            if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && !response.getData().isEmpty()) {
+                return ResponseEntity.ok(response);
+            }
+            return ResponseEntity.ok(HttpResponse.noContent());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(HttpResponse.buildHttpResponse("An error occurred", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), null));
+        }
     }
 
     @PutMapping(IApplicationConstant.Path.Product.UPDATE_PRODUCT)
-    public ResponseEntity<?> update(@RequestBody RequestUpdateProductDto request) {
-        return ResponseEntity.ok(productService.updateProduct(request));
+    public ResponseEntity<?> updateProduct(@RequestBody RequestUpdateProductDto request) {
+        try {
+            HttpResponse<?> response = productService.updateProduct(request);
+            if (Objects.nonNull(response) && Objects.nonNull(response.getData())) {
+                return ResponseEntity.ok(response);
+            }
+            return ResponseEntity.ok(HttpResponse.noContent());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(HttpResponse.buildHttpResponse("An error occurred", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), null));
+        }
     }
 
     @DeleteMapping(IApplicationConstant.Path.Product.DELETE_PRODUCT)
-    public ResponseEntity<?> update(@PathVariable Long ProductId) {
-        return ResponseEntity.ok(productService.deleteProduct(ProductId));
+    public ResponseEntity<?> delete(@PathVariable Long productId) {
+        try {
+            HttpResponse<?> response = productService.deleteProduct(productId);
+            if (Objects.nonNull(response) && Objects.nonNull(response.getData())) {
+                return ResponseEntity.ok(response);
+            }
+            return ResponseEntity.ok(HttpResponse.noContent());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(HttpResponse.buildHttpResponse("An error occurred", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), null));
+        }
     }
 
+    @GetMapping(IApplicationConstant.Path.Product.PRODUCT_DETAIL)
+    public ResponseEntity<?> detailProduct(@PathVariable Long productId) {
+        try {
+            HttpResponse<Object> detailProduct = productService.getDetailProduct(productId);
+            if (Objects.nonNull(detailProduct) && Objects.nonNull(detailProduct.getData())) {
+                return ResponseEntity.ok(detailProduct);
+            }
+            return ResponseEntity.ok(HttpResponse.noContent());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(HttpResponse.buildHttpResponse("An error occurred", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), null));
+        }
+    }
 }
 

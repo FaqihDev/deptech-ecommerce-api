@@ -1,6 +1,7 @@
 package com.jamsirat.atmapi.model.Base;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,7 +21,7 @@ public abstract class BaseMasterData<KEY extends  Serializable> implements Seria
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id",nullable = false)
+    @Column(name = "id", nullable = false)
     protected KEY id;
 
     @Column(name = "is_deleted")

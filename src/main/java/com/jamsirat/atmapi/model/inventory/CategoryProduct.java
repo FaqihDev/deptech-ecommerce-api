@@ -1,4 +1,4 @@
-package com.jamsirat.atmapi.model;
+package com.jamsirat.atmapi.model.inventory;
 
 import com.jamsirat.atmapi.model.Base.AAuditableBase;
 import jakarta.persistence.*;

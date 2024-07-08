@@ -1,5 +1,6 @@
 package com.jamsirat.atmapi.config;
 
+import com.jamsirat.atmapi.exception.HandlerJwtExpiredTokenException;
 import com.jamsirat.atmapi.repository.ITokenRepository;
 import com.jamsirat.atmapi.service.impl.JwtService;
 import jakarta.servlet.*;
@@ -86,7 +87,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     log.info("no roles found");
                 }
             } else {
-                log.info("JWT token is invalid");
+                throw new HandlerJwtExpiredTokenException("JWT token has expired or invalid");
             }
         } else {
             log.info("User email is null or security context is already contains authentications");

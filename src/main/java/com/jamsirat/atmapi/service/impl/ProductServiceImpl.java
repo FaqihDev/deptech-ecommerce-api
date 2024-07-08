@@ -4,11 +4,11 @@ package com.jamsirat.atmapi.service.impl;
 import com.jamsirat.atmapi.dto.base.HttpResponse;
 import com.jamsirat.atmapi.dto.request.product.RequestAddProductDto;
 import com.jamsirat.atmapi.dto.request.product.RequestUpdateProductDto;
-import com.jamsirat.atmapi.dto.response.category.ResponseAddCategoryProductDto;
+import com.jamsirat.atmapi.dto.response.product.ResponseAddProductDto;
 import com.jamsirat.atmapi.dto.response.product.ResponseDetailProductDto;
 import com.jamsirat.atmapi.dto.response.product.ResponseUpdateProductDto;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
-import com.jamsirat.atmapi.model.Product;
+import com.jamsirat.atmapi.model.inventory.Product;
 import com.jamsirat.atmapi.repository.ICategoryRepository;
 import com.jamsirat.atmapi.repository.IProductRepository;
 import com.jamsirat.atmapi.service.IProductService;
@@ -21,7 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
@@ -45,7 +47,8 @@ public class ProductServiceImpl implements IProductService {
                         .productCategory(categoryProduct)
                         .build();
         productRepository.save(product);
-        ResponseAddCategoryProductDto data = MapperUtil.parse(product,ResponseAddCategoryProductDto.class,MatchingStrategies.STRICT);
+        ResponseAddProductDto data = MapperUtil.parse(product,ResponseAddProductDto.class,MatchingStrategies.STRICT);
+        data.setProductCategoryName(categoryProduct.getCategoryName());
         return HttpResponse.buildHttpResponse("Data Added Successfully",
                 "Data Saved",
                 HttpStatus.CREATED,
@@ -54,12 +57,25 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public HttpResponse<Object> getListProduct() {
-        List<Product> product = productRepository.findAll();
-        List<ResponseDetailProductDto> listProduct =   product.stream()
-                .map(productMap -> MapperUtil.parse(productMap, ResponseDetailProductDto.class,MatchingStrategies.STRICT)).collect(Collectors.toList());
-        return  HttpResponse.buildHttpResponse("Data fetched Successfully",
-                "Data Fetched",
+    public HttpResponse<List<ResponseDetailProductDto>> getListProduct() {
+        List<Product> products = productRepository.findAll();
+
+        if (products.isEmpty()) {
+            return HttpResponse.noContent();
+        }
+
+        List<ResponseDetailProductDto> listProduct = products.stream()
+                .map(product -> ResponseDetailProductDto.builder()
+                        .id(product.getId())
+                        .stockProduct(product.getStockProduct())
+                        .productName(product.getProductName())
+                        .descriptionProduct(product.getDescriptionProduct())
+                        .categoryName(product.getProductCategory().getCategoryName())
+                        .build())
+                .collect(Collectors.toList());
+
+        return HttpResponse.buildHttpResponse("Data fetched successfully",
+                "Data fetched",
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
                 listProduct);
@@ -69,7 +85,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public HttpResponse<Object> updateProduct(RequestUpdateProductDto request) {
         var product = productRepository.findById(request.getId()).orElseThrow(() ->  new DataNotFoundException(String.format("Product with id %d is not exist", request.getId()),"please check again your Product id"));
-        var categoryProduct = categoryRepository.findByProducts(product).orElseThrow(() -> new DataNotFoundException(String.format("category  with product id %d is not exist", product.getId()),"please check again your Product id"));
+        var categoryProduct = categoryRepository.findById(request.getProductCategoryId()).orElseThrow(() -> new DataNotFoundException(String.format("category  with product id %d is not exist", product.getId()),"please check again your Product id"));
         product.setProductName(request.getProductName());
         product.setDescriptionProduct(request.getDescriptionProduct());
         product.setStockProduct(request.getStockProduct());
@@ -77,6 +93,7 @@ public class ProductServiceImpl implements IProductService {
         product.setProductCategory(categoryProduct);
         productRepository.save(product);
         ResponseUpdateProductDto responseData =  MapperUtil.parse(product, ResponseUpdateProductDto.class, MatchingStrategies.STRICT);
+        responseData.setCategoryName(categoryProduct.getCategoryName());
         return HttpResponse.buildHttpResponse("Product has been updated",
                 "Data saved",
                  HttpStatus.OK,
@@ -99,14 +116,20 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public HttpResponse<Object> getDetailProduct(Long productId) {
-            Product product = productRepository.findById(productId).orElseThrow(() -> new DataNotFoundException(String.format("Product with id %d is not exist", productId),"please check again your Product id"));
-            ResponseDetailProductDto data = MapperUtil.parse(product,ResponseDetailProductDto.class,MatchingStrategies.STRICT);
-            return HttpResponse.buildHttpResponse("Detail product fetched success",
-                    "Data fetched",
-                    HttpStatus.OK,
-                    HttpStatus.OK.value(),
-                    data);
-
+        var product = productRepository.findById(productId);
+        if (product.isEmpty()) {
+            return HttpResponse.noContent();
+        }
+        Product productOptional = product.get();
+        ResponseDetailProductDto data = MapperUtil.parse(productOptional, ResponseDetailProductDto.class, MatchingStrategies.STRICT);
+        data.setCategoryName(Objects.isNull(productOptional.getProductCategory())
+                ? null
+                : productOptional.getProductCategory().getCategoryName());
+        return HttpResponse.buildHttpResponse("Detail product fetched success",
+                "Data fetched",
+                HttpStatus.OK,
+                HttpStatus.OK.value(),
+                data);
     }
 
 }

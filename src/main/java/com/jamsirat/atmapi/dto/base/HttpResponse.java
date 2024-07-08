@@ -37,5 +37,27 @@ public  class HttpResponse<T> implements Serializable {
                 .build();
     }
 
+    public static <T> HttpResponse<T> noContent() {
+        return HttpResponse.<T>builder()
+                .timeStamp(LocalDateTime.now().toString())
+                .developerMessage("Data is empty")
+                .message("no content")
+                .status(HttpStatus.NO_CONTENT)
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .data(null)
+                .build();
+
+
+    }
+    public static <T> HttpResponse <T> UnAuthorized() {
+        return HttpResponse.<T>builder()
+                .timeStamp(LocalDateTime.now().toString())
+                .developerMessage("Unauthorized")
+                .message("Access Denied")
+                .status(HttpStatus.UNAUTHORIZED)
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .data(null)
+                .build();
+    }
 
 }

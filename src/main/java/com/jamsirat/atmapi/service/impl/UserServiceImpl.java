@@ -6,6 +6,7 @@ import com.jamsirat.atmapi.dto.request.user.RequestUpdateUserDto;
 import com.jamsirat.atmapi.dto.response.user.ResponseDetailUserDto;
 import com.jamsirat.atmapi.dto.response.user.ResponseUpdateUserDto;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
+import com.jamsirat.atmapi.exception.HandlerJwtExpiredTokenException;
 import com.jamsirat.atmapi.exception.IllegalHeaderException;
 import com.jamsirat.atmapi.model.auth.Role;
 import com.jamsirat.atmapi.model.auth.User;
@@ -19,7 +20,9 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 
 
 import java.util.List;
@@ -34,16 +37,20 @@ public class UserServiceImpl implements IUserService {
     private final IUserRepository userRepository;
 
     @Override
-    public HttpResponse<Object> getListUsers() {
+    public HttpResponse<List<ResponseDetailUserDto>> getListUsers() {
         List<User> users = userRepository.findAll();
-        List<ResponseDetailUserDto> listUsers =   users.stream()
+        if (users.isEmpty()) {
+            return HttpResponse.noContent();
+        }
+        List<ResponseDetailUserDto> listUsers = users.stream()
                 .map(user -> {
-                    ResponseDetailUserDto dto = MapperUtil.parse(user, ResponseDetailUserDto.class,MatchingStrategies.STRICT);
+                    ResponseDetailUserDto dto = MapperUtil.parse(user, ResponseDetailUserDto.class, MatchingStrategies.STRICT);
                     dto.setRole(user.getRoles().stream().map(Role::getRoleName).collect(Collectors.joining(", ")));
                     return dto;
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
 
-        return  HttpResponse.buildHttpResponse("Data fetched Successfully",
+        return HttpResponse.buildHttpResponse("Data fetched Successfully",
                 "Data Fetched",
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
@@ -84,22 +91,32 @@ public class UserServiceImpl implements IUserService {
 
         User user = null;
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (Objects.nonNull(authHeader) && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            user = userRepository.findByToken(token);
+        try {
+            if (Objects.nonNull(authHeader) && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                try {
+                    user = userRepository.findByToken(token);
+                } catch (Exception e) {
+                    throw new HandlerJwtExpiredTokenException("JWT Token has expired or invalid");
+                }
 
-            String roles = user.getRoles().stream()
-                    .map(role -> role.getUserRole().getName())
-                    .collect(Collectors.joining(", "));
-            ResponseDetailUserDto data = MapperUtil.parse(user,ResponseDetailUserDto.class,MatchingStrategies.STRICT);
-            data.setRole(roles);
+                String roles = user.getRoles().stream()
+                        .map(role -> role.getUserRole().getName())
+                        .collect(Collectors.joining(", "));
+                ResponseDetailUserDto data = MapperUtil.parse(user,ResponseDetailUserDto.class,MatchingStrategies.STRICT);
+                data.setRole(roles);
 
-            return HttpResponse.buildHttpResponse("Detail users fetched success",
-                    "Data fetched",
-                    HttpStatus.OK,
-                    HttpStatus.OK.value(),
-                    data);
+                return HttpResponse.buildHttpResponse("Detail users fetched success",
+                        "Data fetched",
+                        HttpStatus.OK,
+                        HttpStatus.OK.value(),
+                        data);
 
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(
+                    HttpResponse.UnAuthorized()
+            ).getBody();
         }
         throw new IllegalHeaderException("Authorization header and Bearer is not set","Please check your header");
     }

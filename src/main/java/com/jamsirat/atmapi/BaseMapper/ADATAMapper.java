@@ -59,4 +59,6 @@ public abstract class ADATAMapper<SOURCE,TARGET> implements IDATAMapper<SOURCE,T
         return null;
     }
 
+
+
 }

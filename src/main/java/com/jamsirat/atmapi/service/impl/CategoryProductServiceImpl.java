@@ -7,7 +7,7 @@ import com.jamsirat.atmapi.dto.response.category.ResponseAddCategoryProductDto;
 import com.jamsirat.atmapi.dto.response.category.ResponseDetailCategoryProductDto;
 import com.jamsirat.atmapi.dto.response.category.ResponseUpdateCategoryProductDto;
 import com.jamsirat.atmapi.exception.DataNotFoundException;
-import com.jamsirat.atmapi.model.CategoryProduct;
+import com.jamsirat.atmapi.model.inventory.CategoryProduct;
 import com.jamsirat.atmapi.repository.ICategoryRepository;
 import com.jamsirat.atmapi.service.ICategoryProductService;
 import com.jamsirat.atmapi.util.MapperUtil;
@@ -31,7 +31,6 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
 
     @Override
     public HttpResponse<Object> addCategoryProduct(RequestAddCategoryProductDto request) {
-
         CategoryProduct categoryProduct =
                 CategoryProduct.builder()
                         .categoryName(request.getCategoryName())
@@ -49,20 +48,19 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
     }
 
     @Override
-    public HttpResponse<Object> getListCategoryProduct() {
-        List<CategoryProduct> CategoryProduct = categoryRepository.findAll();
-        List<ResponseDetailCategoryProductDto> listCategoryProduct =   CategoryProduct.stream()
-                .map(CategoryProduct1 -> {
-                    ResponseDetailCategoryProductDto category = MapperUtil.parse(CategoryProduct1, ResponseDetailCategoryProductDto.class, MatchingStrategies.STRICT);
-                    return category;
-                }).collect(Collectors.toList());
-
-        return  HttpResponse.buildHttpResponse("Data fetched Successfully",
-                "Data Fetched",
+    public HttpResponse<List<ResponseDetailCategoryProductDto>> getListCategoryProduct() {
+        List<CategoryProduct> categories = categoryRepository.findAll();
+        if (categories.isEmpty()) {
+            return HttpResponse.noContent();
+        }
+        List<ResponseDetailCategoryProductDto> data = categories.stream()
+                .map(category -> MapperUtil.parse(category, ResponseDetailCategoryProductDto.class, MatchingStrategies.STRICT))
+                .collect(Collectors.toList());
+        return HttpResponse.buildHttpResponse("Categories fetched successfully",
+                "Data fetched",
                 HttpStatus.OK,
                 HttpStatus.OK.value(),
-                listCategoryProduct);
-
+                data);
     }
 
     @Override
@@ -92,14 +90,18 @@ public class CategoryProductServiceImpl implements ICategoryProductService {
     }
 
     @Override
-    public HttpResponse<Object> getDetailCategoryProduct(Long categoryId) {
-        CategoryProduct CategoryProduct = categoryRepository.findById(categoryId).orElseThrow(() -> new DataNotFoundException(String.format("CategoryProduct with id %d is not exist", categoryId), "please check again your CategoryProduct id"));
-        ResponseDetailCategoryProductDto data = MapperUtil.parse(CategoryProduct, ResponseDetailCategoryProductDto.class, MatchingStrategies.STRICT);
-        return HttpResponse.buildHttpResponse("Detail CategoryProduct fetched success",
-                "Data fetched",
-                HttpStatus.OK,
-                HttpStatus.OK.value(),
-                data);
-
+    public HttpResponse<ResponseDetailCategoryProductDto> getDetailCategoryProduct(Long categoryId) {
+        var categoryProductOptional = categoryRepository.findById(categoryId);
+        if (categoryProductOptional.isPresent()) {
+            CategoryProduct categoryProduct = categoryProductOptional.get();
+            ResponseDetailCategoryProductDto data = MapperUtil.parse(categoryProduct, ResponseDetailCategoryProductDto.class, MatchingStrategies.STRICT);
+            return HttpResponse.buildHttpResponse("Detail CategoryProduct fetched successfully",
+                    "Data fetched",
+                    HttpStatus.OK,
+                    HttpStatus.OK.value(),
+                    data);
+        }
+        return HttpResponse.noContent();
     }
+
 }
