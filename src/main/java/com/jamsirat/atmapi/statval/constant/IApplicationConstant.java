@@ -86,6 +86,7 @@ public interface IApplicationConstant {
                 String OUT_OF_STOCK_EXCEPTION = "Please contact your Administrator";
                 String TOKEN_IS_INVALID       = "Please do login";
                 String AUTHORIZATION_HEADER_INVALID = "Please check your header";
+                String BAD_CREDENTIALS = "Please check your password and email";
             }
 
             interface SuccessMessage {

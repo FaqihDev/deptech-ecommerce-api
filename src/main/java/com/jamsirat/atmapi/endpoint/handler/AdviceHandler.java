@@ -76,9 +76,9 @@ public class AdviceHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public HttpResponse badCredentials(BadCredentialsException e) {
-        return customExceptionHandler.createHttpResponse(HttpStatus.BAD_REQUEST,e.getExceptionMessage(),e.getDeveloperMessage());
+        return customExceptionHandler.createHttpResponse(HttpStatus.UNAUTHORIZED,e.getExceptionMessage(),e.getDeveloperMessage());
     }
 
     @ExceptionHandler(UserNotFoundException.class)

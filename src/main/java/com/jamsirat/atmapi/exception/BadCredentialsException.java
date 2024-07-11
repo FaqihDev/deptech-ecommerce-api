@@ -11,8 +11,8 @@ public class BadCredentialsException extends AuthenticationException implements 
     private String exceptionMessage;
     private String developerMessage;
 
-    public BadCredentialsException(String msg, Throwable cause, String developerMessage) {
-        super(msg, cause);
+    public BadCredentialsException(String msg, String developerMessage) {
+        super(msg, null);
         this.exceptionMessage = msg;
         this.developerMessage = developerMessage;
 

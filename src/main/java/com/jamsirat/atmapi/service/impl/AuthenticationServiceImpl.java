@@ -117,7 +117,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
            log.info("Authentication failed : {} ", e.getMessage());
            throw new UserNotActivatedException(ExceptionMessage.USER_NOT_ACTIVATED_EXCEPTION, DeveloperExceptionMessage.USER_NOT_ACTIVATED_EXCEPTION);
        } catch (org.springframework.security.authentication.BadCredentialsException e) {
-           throw new BadCredentialsException(ExceptionMessage.BAD_CREDENTIALS);
+           throw new BadCredentialsException(ExceptionMessage.BAD_CREDENTIALS,DeveloperExceptionMessage.BAD_CREDENTIALS);
        } catch (UserNotFoundException e) {
            throw new UserNotFoundException(ExceptionMessage.USER_NOT_FOUND_EXCEPTION);
        }
